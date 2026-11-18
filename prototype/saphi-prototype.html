@@ -1,0 +1,1668 @@
+<title>Saphi App Prototype</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,650&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Color+Emoji&display=swap">
+<style>
+/* Layout: one phone-width column; glass panes (header chip, tools, stats, nav, sheets) float over a soft dappled-light ground. */
+:root {
+  --paper: #F8FAF6; --paper-2: #EEF3EC; --ink: #1B2620; --ink-2: #4F5E54; --ink-3: #65726A;
+  --forest: #1F4A34; --forest-ink: #F4F8F3; --leaf: #3D7A4E; --soil: #7B5236;
+  --plant-fill: .24; --pot: #B4643E; --pot-soil: rgba(92,62,44,.30); --bed: #F1E9DE; --bed-edge: rgba(123,82,54,.28); --bed-line: rgba(123,82,54,.10); --bed-major: rgba(123,82,54,.26);
+  --glass: rgba(255,255,255,.58); --glass-strong: rgba(255,255,255,.84); --glass-edge: rgba(255,255,255,.9);
+  --line: rgba(27,38,32,.09); --shadow: 0 12px 32px -14px rgba(31,74,52,.32);
+  --warn: #9A600E; --crit: #A3402B; --good: #2F7A45; --warn-bg: rgba(154,96,14,.10); --crit-bg: rgba(163,64,43,.10); --good-bg: rgba(47,122,69,.10);
+  --blob1: rgba(61,122,78,.20); --blob2: rgba(123,82,54,.14); --scrim: rgba(20,30,24,.30);
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --r-lg: 22px; --r-md: 16px; --r-sm: 12px;
+  --ease: cubic-bezier(.16,1,.3,1);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0B1310; --paper-2: #111B16; --ink: #E6EEE8; --ink-2: #B3C2B8; --ink-3: #A0AEA4;
+    --forest: #A9DBBB; --forest-ink: #0B1310; --leaf: #86C79A; --soil: #CDB49B;
+    --plant-fill: .34; --pot: rgba(214,226,218,.62); --pot-soil: rgba(214,226,218,.07); --bed: #121B16; --bed-edge: rgba(169,219,187,.24); --bed-line: rgba(169,219,187,.05); --bed-major: rgba(169,219,187,.13);
+    --glass: rgba(17,27,22,.62); --glass-strong: rgba(18,29,24,.94); --glass-edge: rgba(255,255,255,.07);
+    --line: rgba(228,236,229,.10); --shadow: 0 14px 34px -14px rgba(0,0,0,.7);
+    --warn: #E5AE52; --crit: #EE927C; --good: #82CC98; --warn-bg: rgba(229,174,82,.12); --crit-bg: rgba(238,146,124,.12); --good-bg: rgba(130,204,152,.12);
+    --blob1: rgba(134,199,154,.09); --blob2: rgba(120,160,200,.07); --scrim: rgba(0,0,0,.5);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"], :root[data-mode="night"] {
+  --paper: #0B1310; --paper-2: #111B16; --ink: #E6EEE8; --ink-2: #B3C2B8; --ink-3: #A0AEA4;
+  --forest: #A9DBBB; --forest-ink: #0B1310; --leaf: #86C79A; --soil: #CDB49B;
+  --plant-fill: .34; --pot: rgba(214,226,218,.62); --pot-soil: rgba(214,226,218,.07); --bed: #121B16; --bed-edge: rgba(169,219,187,.24); --bed-line: rgba(169,219,187,.05); --bed-major: rgba(169,219,187,.13);
+  --glass: rgba(17,27,22,.62); --glass-strong: rgba(18,29,24,.94); --glass-edge: rgba(255,255,255,.07);
+  --line: rgba(228,236,229,.10); --shadow: 0 14px 34px -14px rgba(0,0,0,.7);
+  --warn: #E5AE52; --crit: #EE927C; --good: #82CC98; --warn-bg: rgba(229,174,82,.12); --crit-bg: rgba(238,146,124,.12); --good-bg: rgba(130,204,152,.12);
+  --blob1: rgba(134,199,154,.09); --blob2: rgba(120,160,200,.07); --scrim: rgba(0,0,0,.5);
+  color-scheme: dark;
+}
+:root[data-mode="day"] {
+  --paper: #F8FAF6; --paper-2: #EEF3EC; --ink: #1B2620; --ink-2: #4F5E54; --ink-3: #65726A;
+  --forest: #1F4A34; --forest-ink: #F4F8F3; --leaf: #3D7A4E; --soil: #7B5236;
+  --plant-fill: .24; --pot: #B4643E; --pot-soil: rgba(92,62,44,.30); --bed: #F1E9DE; --bed-edge: rgba(123,82,54,.28); --bed-line: rgba(123,82,54,.10); --bed-major: rgba(123,82,54,.26);
+  --glass: rgba(255,255,255,.58); --glass-strong: rgba(255,255,255,.84); --glass-edge: rgba(255,255,255,.9);
+  --line: rgba(27,38,32,.09); --shadow: 0 12px 32px -14px rgba(31,74,52,.32);
+  --warn: #9A600E; --crit: #A3402B; --good: #2F7A45; --warn-bg: rgba(154,96,14,.10); --crit-bg: rgba(163,64,43,.10); --good-bg: rgba(47,122,69,.10);
+  --blob1: rgba(61,122,78,.20); --blob2: rgba(123,82,54,.14); --scrim: rgba(20,30,24,.30);
+  color-scheme: light;
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--f-body); font-size: 15px; line-height: 1.45;
+  -webkit-font-smoothing: antialiased; overflow: hidden;
+  transition: background-color .6s var(--ease), color .6s var(--ease);
+}
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(38% 28% at 12% 8%, var(--blob1), transparent 70%),
+    radial-gradient(30% 24% at 92% 30%, var(--blob2), transparent 70%),
+    radial-gradient(40% 30% at 70% 96%, var(--blob1), transparent 70%),
+    radial-gradient(26% 20% at 6% 70%, var(--blob2), transparent 70%);
+}
+::selection { background: var(--forest); color: var(--forest-ink); }
+* { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; background: none; border: 0; padding: 0; }
+:focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; border-radius: 10px; }
+.ic { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.ic.sm { width: 16px; height: 16px; }
+.num { font-variant-numeric: tabular-nums; }
+.mono { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0; }
+
+.app { position: relative; z-index: 1; height: 100%; max-width: 460px; margin: 0 auto; display: flex; flex-direction: column; }
+.screens {
+  flex: 1; overflow-y: auto; overscroll-behavior: contain;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 18px 112px;
+}
+.view { display: flex; flex-direction: column; gap: 18px; animation: rise .5s var(--ease) both; }
+@keyframes rise { from { opacity: .6; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.glass {
+  background: var(--glass); border: 1px solid var(--glass-edge);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3); backdrop-filter: blur(18px) saturate(1.3);
+  box-shadow: var(--shadow);
+}
+h1 { font-family: var(--f-display); font-weight: 650; font-size: 30px; line-height: 1.05; letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--f-display); font-weight: 650; font-size: 19px; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+h3 { font-size: 15px; font-weight: 600; margin: 0; }
+p { margin: 0; }
+.muted { color: var(--ink-2); }
+.faint { color: var(--ink-3); }
+.section { display: flex; flex-direction: column; gap: 10px; }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 6px; }
+.link { color: var(--leaf); font-weight: 600; font-size: 14px; }
+
+/* top bar */
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.title-row { display: flex; align-items: center; gap: 10px; min-width: 0; flex-wrap: wrap; }
+.chip-btn {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px 0 14px;
+  border-radius: 999px; font-weight: 600; font-size: 14px; max-width: 100%;
+}
+.chip-btn span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dims { display: flex; gap: 12px; flex-wrap: wrap; color: var(--ink-2); }
+.row a.icon-btn .ic { transform: rotate(-90deg); }
+.icon-btn { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: var(--ink-2); flex: none; }
+
+/* sandbox */
+.sandbox-row { display: grid; grid-template-columns: minmax(0,1fr) 48px; gap: 10px; align-items: start; }
+.stage { min-width: 0; display: flex; justify-content: center; align-items: flex-start; }
+.stage svg { display: block; touch-action: none; user-select: none; -webkit-user-select: none; overflow: visible; }
+.tools { display: flex; flex-direction: column; gap: 8px; padding: 4px; border-radius: 999px; }
+.tool { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: var(--ink-2); position: relative; transition: background-color .2s, color .2s, transform .2s var(--ease); }
+.tool:hover { background: var(--line); color: var(--ink); }
+.tool:active { transform: scale(.94); }
+.tool.primary { background: var(--forest); color: var(--forest-ink); box-shadow: 0 8px 18px -8px var(--forest); }
+.tool.primary:hover { background: var(--forest); filter: brightness(1.1); }
+.tool[aria-pressed="true"] { color: var(--leaf); background: var(--good-bg); }
+.tool:disabled { opacity: .35; cursor: default; }
+.tool .badge { position: absolute; top: 2px; right: 1px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: var(--crit); color: var(--paper); font-size: 10px; font-weight: 600; display: grid; place-items: center; }
+
+.pl { cursor: grab; }
+.pl:active { cursor: grabbing; }
+.pl ellipse.body { fill-opacity: var(--plant-fill); transition: fill-opacity .2s; }
+.pl:hover ellipse.body { fill-opacity: calc(var(--plant-fill) + .1); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 14px; height: 14px; border-radius: 50%; flex: none; display: grid; place-items: center; font-style: normal; font-size: 10px; font-weight: 700; color: var(--paper); }
+.legend .lg-issue { background: var(--warn); }
+.legend .lg-sel { border: 2px solid var(--ink); }
+.legend .lg-good { width: 16px; height: 0; border-radius: 0; border-top: 2px dotted var(--good); }
+
+/* tutorial */
+.tour { position: absolute; z-index: 50; inset: 0; display: grid; place-items: end center; padding: 16px max(12px, env(safe-area-inset-right, 0px)) 16px max(12px, env(safe-area-inset-left, 0px)); background: var(--scrim); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.tour-card { width: 100%; border-radius: 28px; padding: 22px 20px 18px; background: var(--glass-strong); display: flex; flex-direction: column; gap: 14px; animation: rise .5s var(--ease) both; }
+.tour-visual { height: 150px; border-radius: 20px; background: var(--paper-2); display: grid; place-items: center; overflow: hidden; }
+.tour-card h2 { font-size: 24px; }
+.tour-card p { color: var(--ink-2); }
+.dots { display: flex; gap: 6px; }
+.dots i { width: 6px; height: 6px; border-radius: 3px; background: var(--line); transition: width .3s var(--ease), background-color .3s; }
+.dots i.on { width: 20px; background: var(--forest); }
+.tour-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.tour-nav .btn.primary { flex: none; padding: 0 22px; }
+
+/* sow this month */
+.sow { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 8px; margin: 0 -2px; scroll-snap-type: x mandatory; }
+.sow button { scroll-snap-align: start; display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px 0 12px; border-radius: 999px; white-space: nowrap; font-weight: 600; font-size: 14px; }
+
+/* weather day buttons */
+button.fday { width: 100%; }
+button.fday:hover { background: var(--line); }
+.fday .tag { font-size: 10.5px; font-weight: 700; color: var(--warn); letter-spacing: .02em; }
+
+/* plus */
+.plus { border-radius: var(--r-lg); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.plus .price { display: flex; align-items: baseline; gap: 8px; font-family: var(--f-display); }
+.plus .price b { font-size: 26px; font-weight: 650; }
+.plus .price s { color: var(--ink-3); font-size: 16px; }
+.pill.plusp { background: color-mix(in srgb, var(--soil) 18%, transparent); color: var(--soil); }
+.pl text { font-family: var(--f-body); font-weight: 600; fill: var(--ink); paint-order: stroke; stroke: var(--bed); stroke-linejoin: round; pointer-events: none; }
+.ruler { font-family: var(--f-mono); fill: var(--ink-3); }
+.dragging .issue-layer { opacity: 0; }
+.issue-layer { transition: opacity .2s; pointer-events: none; }
+.sel-ring { stroke: var(--ink); fill: none; }
+
+/* stats strip */
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); border-radius: var(--r-md); overflow: hidden; }
+.stat { padding: 12px 12px 11px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.stat + .stat { border-left: 1px solid var(--line); }
+.stat .label { font-size: 12px; color: var(--ink-2); display: flex; align-items: center; gap: 5px; }
+.stat .value { font-family: var(--f-display); font-weight: 650; font-size: 22px; line-height: 1.1; }
+.stat .sub { font-size: 12px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stat.water .value { letter-spacing: .18em; color: var(--ink-3); }
+button.stat { text-align: left; }
+button.stat:hover { background: var(--line); }
+
+.reminder { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: var(--r-md); }
+.reminder .bell { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--good-bg); color: var(--leaf); flex: none; }
+.reminder p { flex: 1; min-width: 0; font-size: 14px; }
+
+/* lists */
+.panel { border-radius: var(--r-lg); padding: 6px; }
+.row { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 14px; min-width: 0; }
+.row + .row { border-top: 1px solid var(--line); border-radius: 0 0 14px 14px; }
+.row .grow { flex: 1; min-width: 0; }
+.row .grow p { font-size: 13px; color: var(--ink-2); }
+.check {
+  width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--ink-3); display: grid; place-items: center; flex: none;
+  color: transparent; transition: background-color .25s var(--ease), border-color .25s, color .25s;
+}
+.check[aria-checked="true"] { background: var(--leaf); border-color: var(--leaf); color: var(--paper); }
+.task-done h3 { text-decoration: line-through; text-decoration-color: var(--ink-3); color: var(--ink-3); }
+.swatch { width: 12px; height: 12px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 22%, transparent); flex: none; }
+
+.pill { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.pill.crit { background: var(--crit-bg); color: var(--crit); }
+.pill.warn { background: var(--warn-bg); color: var(--warn); }
+.pill.good { background: var(--good-bg); color: var(--good); }
+.pill.plain { background: var(--line); color: var(--ink-2); }
+
+/* home */
+.greet { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.greet p { margin-top: 6px; }
+.streak { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: var(--r-lg); }
+.streak .flame { width: 42px; height: 42px; border-radius: 50%; background: color-mix(in srgb, var(--soil) 16%, transparent); color: var(--soil); display: grid; place-items: center; flex: none; }
+.weeks { display: flex; gap: 6px; margin-top: 8px; }
+.weeks i { width: 100%; max-width: 22px; height: 6px; border-radius: 3px; background: var(--line); }
+.weeks i.on { background: var(--leaf); }
+.weeks i.now { background: linear-gradient(90deg, var(--leaf) 60%, var(--line) 60%); }
+.spaces { display: grid; grid-auto-flow: column; grid-auto-columns: 168px; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 2px 2px 14px; margin: 0 -2px; }
+.space-card { scroll-snap-align: start; border-radius: var(--r-lg); padding: 12px; display: flex; flex-direction: column; gap: 10px; text-align: left; }
+.space-card .thumb { height: 110px; display: grid; place-items: center; }
+.space-card h3 { font-size: 14px; }
+.space-card .meta { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.tip { display: flex; gap: 12px; padding: 14px 16px; border-radius: var(--r-lg); }
+.tip .ic { color: var(--leaf); margin-top: 2px; }
+.tip p { font-size: 14px; }
+
+/* harvest timeline */
+.tl { display: flex; flex-direction: column; gap: 4px; }
+.bar { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; margin-top: 6px; }
+.bar > i { display: block; height: 100%; border-radius: 3px; background: var(--leaf); }
+.bar > i.ready { background: var(--soil); }
+
+/* profile */
+.me { display: flex; align-items: center; gap: 14px; }
+.avatar { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: var(--forest); color: var(--forest-ink); flex: none; }
+.avatar .ic { width: 30px; height: 30px; }
+.level { margin-top: 8px; }
+.level .bar { height: 8px; }
+.trio { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); border-radius: var(--r-lg); overflow: hidden; }
+.trio div { padding: 14px; display: flex; flex-direction: column; gap: 2px; }
+.trio div + div { border-left: 1px solid var(--line); }
+.trio b { font-family: var(--f-display); font-weight: 650; font-size: 24px; line-height: 1; }
+.trio span { font-size: 12px; color: var(--ink-2); }
+.ach { display: flex; gap: 12px; align-items: center; }
+.ach .medal { width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; background: var(--good-bg); color: var(--leaf); flex: none; }
+.ach.locked .medal { background: var(--line); color: var(--ink-3); }
+.ach.locked h3 { color: var(--ink-2); }
+.herb { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+@media (min-width: 420px) { .herb { grid-template-columns: repeat(3, minmax(0,1fr)); } }
+.herb button { border-radius: var(--r-md); padding: 12px; text-align: left; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.herb .leafmark { width: 34px; height: 34px; border-radius: 12px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 18%, transparent); color: var(--c); }
+.herb h3 { font-size: 14px; }
+.herb .sci { font-size: 12px; }
+.herb .undisc { opacity: .5; border-style: dashed; box-shadow: none; }
+.sci { font-style: italic; color: var(--ink-2); }
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); padding: 4px; border-radius: 999px; gap: 4px; }
+.seg button { height: 36px; border-radius: 999px; font-weight: 600; font-size: 14px; color: var(--ink-2); display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.seg button[aria-pressed="true"] { background: var(--forest); color: var(--forest-ink); }
+.seg button:disabled { opacity: .5; cursor: default; }
+.setting { display: flex; flex-direction: column; gap: 8px; padding: 12px 10px; }
+.setting + .setting { border-top: 1px solid var(--line); }
+.setting .between { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+
+/* nav */
+.nav {
+  position: absolute; z-index: 20; bottom: 12px;
+  left: max(12px, env(safe-area-inset-left, 0px)); right: max(12px, env(safe-area-inset-right, 0px));
+  display: grid; grid-template-columns: repeat(4, 1fr); padding: 6px; border-radius: 26px;
+  background: var(--glass-strong);
+}
+.nav a { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 7px 0 6px; border-radius: 20px; color: var(--ink-3); text-decoration: none; font-size: 11.5px; font-weight: 600; transition: color .25s, background-color .25s; }
+.nav a[aria-current="page"] { color: var(--forest); background: var(--good-bg); }
+.nav a:hover { color: var(--ink); }
+
+/* sheet */
+.scrim { position: absolute; inset: 0; z-index: 30; background: var(--scrim); opacity: 0; transition: opacity .3s; }
+.scrim.show { opacity: 1; }
+.sheet {
+  position: absolute; z-index: 31; left: 0; right: 0; bottom: 0; max-height: 84%;
+  display: flex; flex-direction: column;
+  border-radius: 26px 26px 0 0; background: var(--glass-strong);
+  -webkit-backdrop-filter: blur(28px) saturate(1.4); backdrop-filter: blur(28px) saturate(1.4);
+  border: 1px solid var(--glass-edge); border-bottom: 0; box-shadow: 0 -18px 40px -20px rgba(0,0,0,.35);
+  transform: translateY(105%); transition: transform .42s var(--ease); visibility: hidden;
+}
+.sheet.open { transform: none; visibility: visible; }
+.sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--line); margin: 8px auto 0; flex: none; }
+.sheet-body { overflow-y: auto; padding: 10px max(18px, env(safe-area-inset-right, 0px)) 22px max(18px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 16px; }
+.sh-head { display: flex; align-items: flex-start; gap: 12px; }
+.sh-head .grow { flex: 1; min-width: 0; }
+.sh-head .swatch { margin-top: 8px; }
+.facts { display: flex; flex-wrap: wrap; gap: 6px; }
+.fact { display: inline-flex; align-items: center; gap: 5px; height: 30px; padding: 0 10px; border-radius: 999px; background: var(--line); font-size: 13px; color: var(--ink-2); }
+.slider { display: grid; grid-template-columns: 64px 1fr 62px; align-items: center; gap: 10px; }
+.slider label { font-size: 13px; color: var(--ink-2); }
+.slider output { text-align: right; }
+input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 28px; background: transparent; accent-color: var(--forest); }
+input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: var(--line); }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--forest); border: 3px solid var(--paper); margin-top: -9px; box-shadow: 0 2px 6px rgba(0,0,0,.25); }
+input[type=range]::-moz-range-track { height: 4px; border-radius: 2px; background: var(--line); }
+input[type=range]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--forest); border: 3px solid var(--paper); }
+.issues { display: flex; flex-direction: column; gap: 8px; }
+.issue { display: flex; gap: 10px; padding: 10px 12px; border-radius: 14px; font-size: 14px; }
+.issue.crit { background: var(--crit-bg); } .issue.crit > .ic { color: var(--crit); }
+.issue.warn { background: var(--warn-bg); } .issue.warn > .ic { color: var(--warn); }
+.issue.good { background: var(--good-bg); } .issue.good > .ic { color: var(--good); }
+.issue .grow { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.issue small { font-size: 12px; color: var(--ink-2); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { height: 44px; padding: 0 16px; border-radius: 999px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: var(--line); }
+.btn:hover { filter: brightness(.97); }
+.btn.primary { background: var(--forest); color: var(--forest-ink); flex: 1; }
+.btn.danger { color: var(--crit); background: var(--crit-bg); }
+.search { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 14px; border-radius: 999px; background: var(--line); }
+.search input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; }
+.search input::placeholder { color: var(--ink-3); }
+.cat-row { width: 100%; text-align: left; }
+.cat-row:hover { background: var(--line); }
+.form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field.full { grid-column: 1 / -1; }
+.field label { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.field input { height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--paper); padding: 0 12px; outline: 0; width: 100%; }
+.field input:focus { border-color: var(--leaf); }
+.field .hint { font-size: 12px; color: var(--ink-3); }
+.err { color: var(--crit); font-size: 13px; }
+.radio-row { width: 100%; text-align: left; }
+.radio-row[aria-checked="true"] { background: var(--good-bg); }
+.radio-dot { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--ink-3); display: grid; place-items: center; flex: none; }
+.radio-row[aria-checked="true"] .radio-dot { border-color: var(--leaf); }
+.radio-row[aria-checked="true"] .radio-dot::after { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--leaf); }
+
+.toast {
+  position: absolute; z-index: 40; left: 50%; top: 14px; transform: translate(-50%, -140%);
+  display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 16px; border-radius: 999px;
+  background: var(--ink); color: var(--paper); font-size: 14px; font-weight: 500; max-width: calc(100% - 32px);
+  transition: transform .4s var(--ease); box-shadow: var(--shadow);
+}
+.toast.show { transform: translate(-50%, 0); }
+.toast button { height: 32px; padding: 0 12px; border-radius: 999px; background: color-mix(in srgb, var(--paper) 16%, transparent); font-weight: 600; }
+.toast button[hidden] { display: none; }
+.emo { font-family: "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", sans-serif; font-style: normal; line-height: 1; }
+.pemo { width: 38px; height: 38px; border-radius: 13px; display: grid; place-items: center; font-size: 21px; background: color-mix(in srgb, var(--c) 16%, transparent); flex: none; }
+.pemo.sm { width: 30px; height: 30px; border-radius: 10px; font-size: 17px; }
+.pl text.emo { stroke: none; }
+
+/* weather */
+.forecast { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 4px; }
+.fday { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 2px; border-radius: 14px; text-align: center; }
+.fday.alert { background: var(--warn-bg); }
+.fday b { font-size: 13px; font-weight: 600; }
+.fday .ic { color: var(--ink-2); }
+.fday.alert .ic { color: var(--warn); }
+.fday span { font-size: 12px; color: var(--ink-2); }
+.prec .emos { display: flex; gap: 2px; font-size: 16px; }
+.note { font-size: 12px; color: var(--ink-3); padding: 2px 10px 8px; }
+
+/* sun study */
+.slots { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
+.slot { position: relative; aspect-ratio: 3 / 4; max-width: 100%; border-radius: 14px; border: 1.5px dashed var(--line); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; overflow: hidden; color: var(--ink-2); cursor: pointer; text-align: center; padding: 6px; }
+.slot:hover { border-color: var(--leaf); color: var(--leaf); }
+.slot.done { border-style: solid; border-color: var(--leaf); }
+.slot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.slot .t { position: relative; z-index: 1; font-family: var(--f-mono); font-size: 13px; font-weight: 500; }
+.slot.done .t { background: var(--glass-strong); padding: 2px 8px; border-radius: 999px; color: var(--ink); }
+.slot input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.slot:focus-within { outline: 2px solid var(--leaf); outline-offset: 2px; }
+.switch { position: relative; width: 46px; height: 28px; border-radius: 14px; background: var(--line); flex: none; transition: background-color .2s; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--paper); box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .25s var(--ease); }
+.switch[aria-checked="true"] { background: var(--leaf); }
+.switch[aria-checked="true"]::after { transform: translateX(18px); }
+select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--paper); padding: 0 10px; width: 100%; }
+
+/* tiered achievements */
+.tier { position: relative; }
+.tier .num-badge { position: absolute; right: -4px; bottom: -4px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 9px; background: var(--forest); color: var(--forest-ink); font-size: 10px; font-weight: 700; display: grid; place-items: center; font-family: var(--f-mono); }
+.ach .bar { height: 5px; }
+.reward { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--soil); font-weight: 600; margin-top: 6px; }
+.plan { display: flex; gap: 12px; align-items: center; padding: 14px 16px; border-radius: var(--r-lg); }
+.plan .ic { color: var(--soil); }
+
+.example { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3.5 10.5 12 3.5l8.5 7V19a1.5 1.5 0 0 1-1.5 1.5h-4.5v-6h-5v6H5A1.5 1.5 0 0 1 3.5 19z"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19.5C5 11 10 5 19.5 4.5 19.5 14 14 19 5 19.5z"/><path d="M5 19.5 13.5 11"/></symbol>
+  <symbol id="i-basket" viewBox="0 0 24 24"><path d="M3.5 10h17l-1.6 8.6a2 2 0 0 1-2 1.6H7.1a2 2 0 0 1-2-1.6z"/><path d="M8 10l3-5.5M16 10l-3-5.5M9.5 14v2.5M14.5 14v2.5"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1.4-3.8 4.2-5.5 7.5-5.5s6.1 1.7 7.5 5.5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3.5s6 6.4 6 10.8a6 6 0 0 1-12 0C6 9.9 12 3.5 12 3.5z"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5z"/></symbol>
+  <symbol id="i-auto" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17A8.5 8.5 0 0 0 12 3.5z" fill="currentColor"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M6 9.5l6 6 6-6"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 3c1 4 5.5 5.5 5.5 10.5a5.5 5.5 0 0 1-11 0c0-2.6 1.4-4.3 2.6-5.3.4 2 1.4 3.2 2.6 3.2C11.7 8.5 11 6 12 3z"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4M12 16.8v.2"/></symbol>
+  <symbol id="i-sprout" viewBox="0 0 24 24"><path d="M12 21v-8.5"/><path d="M12 12.5C12 8.5 9 6.5 5 6.5c0 4 3 6 7 6z"/><path d="M12 10.5c0-3.5 2.6-5.5 6.5-5.5 0 3.6-2.6 5.5-6.5 5.5z"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2.5"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.3-4.3"/></symbol>
+  <symbol id="i-flower" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.4"/><path d="M12 9.6c-1.6-2.6-1.6-5.1 0-6.6 1.6 1.5 1.6 4 0 6.6zM12 14.4c1.6 2.6 1.6 5.1 0 6.6-1.6-1.5-1.6-4 0-6.6zM9.6 12c-2.6 1.6-5.1 1.6-6.6 0 1.5-1.6 4-1.6 6.6 0zM14.4 12c2.6-1.6 5.1-1.6 6.6 0-1.5 1.6-4 1.6-6.6 0z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.5 19 6v5.5c0 4.5-3 7.7-7 9-4-1.3-7-4.5-7-9V6z"/><path d="M9 12l2.2 2.2L15.5 10"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5.5" y="10.5" width="13" height="10" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></symbol>
+  <symbol id="i-ruler" viewBox="0 0 24 24"><path d="M3.5 15.5 15.5 3.5l5 5-12 12z"/><path d="M7.5 11.5l2 2M10.5 8.5l2 2M13.5 5.5l2 2"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 17.5a4.5 4.5 0 0 1-.4-9 5.5 5.5 0 0 1 10.6 1.5A3.8 3.8 0 0 1 17 17.5z"/><path d="M9 20.5l1-1.5M13 20.5l1-1.5"/></symbol>
+</svg>
+
+<div class="app" id="app">
+  <main class="screens" id="screens"><div class="view" id="view"></div></main>
+
+  <nav class="nav glass" aria-label="Principal">
+    <a href="#home" data-view="home"><svg class="ic"><use href="#i-home"/></svg>Inicio</a>
+    <a href="#garden" data-view="garden"><svg class="ic"><use href="#i-leaf"/></svg>Jardín</a>
+    <a href="#harvest" data-view="harvest"><svg class="ic"><use href="#i-basket"/></svg>Cosecha</a>
+    <a href="#profile" data-view="profile"><svg class="ic"><use href="#i-user"/></svg>Perfil</a>
+  </nav>
+
+  <div class="scrim" id="scrim" hidden></div>
+  <section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Detalles" aria-hidden="true">
+    <div class="grab"></div>
+    <div class="sheet-body" id="sheet-body"></div>
+  </section>
+
+  <div class="tour" id="tour" role="dialog" aria-modal="true" aria-labelledby="tour-title" hidden></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"><span id="toast-msg"></span><button id="toast-act" hidden>Deshacer</button></div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  /* ---------- Catalog (sizes in cm at maturity) ---------- */
+  const CATALOG = {
+    lavender:   { name: "Lavanda", g: "f", sci: "Lavandula angustifolia", kind: "garden", family: "Lamiaceae", h: 60, sx: 60, sy: 60, sun: "full", water: 2, ph: [6.5, 8.0], rarity: 1, color: "#8A78B8", life: "Perenne", pollinator: true },
+    rosemary:   { name: "Romero", g: "m", sci: "Salvia rosmarinus", kind: "garden", family: "Lamiaceae", h: 120, sx: 90, sy: 90, sun: "full", water: 2, ph: [6.0, 7.5], rarity: 1, color: "#5E8C6A", life: "Perenne" },
+    hydrangea:  { name: "Hortensia", g: "f", sci: "Hydrangea macrophylla", kind: "garden", family: "Hydrangeaceae", h: 150, sx: 150, sy: 150, sun: "partial", water: 8, ph: [5.0, 6.5], rarity: 3, color: "#6C8EC4", life: "Arbusto" },
+    agapanthus: { name: "Agapanto", g: "m", sci: "Agapanthus praecox", kind: "garden", family: "Amaryllidaceae", h: 80, sx: 60, sy: 60, sun: "full", water: 4, ph: [6.0, 7.5], rarity: 1, color: "#4F6FB0", life: "Perenne", pollinator: true },
+    salvia:     { name: "Salvia mexicana", g: "f", sci: "Salvia leucantha", kind: "garden", family: "Lamiaceae", h: 80, sx: 60, sy: 60, sun: "full", water: 3, ph: [6.0, 7.5], rarity: 3, color: "#9A4F86", life: "Perenne", pollinator: true },
+    mint:       { name: "Menta", g: "f", sci: "Mentha spicata", kind: "garden", family: "Lamiaceae", h: 40, sx: 60, sy: 60, sun: "partial", water: 7, ph: [6.0, 7.5], rarity: 1, color: "#3E9A6E", life: "Perenne", invasive: true },
+    stipa:      { name: "Flechilla", g: "f", sci: "Nassella tenuissima", kind: "garden", family: "Poaceae", h: 60, sx: 45, sy: 45, sun: "full", water: 2, ph: [6.0, 8.0], rarity: 3, color: "#B79B5C", life: "Gramínea", native: true },
+    azalea:     { name: "Azalea", g: "f", sci: "Rhododendron simsii", kind: "garden", family: "Ericaceae", h: 100, sx: 90, sy: 90, sun: "partial", water: 7, ph: [4.5, 6.0], rarity: 3, color: "#C9607F", life: "Arbusto" },
+    passion:    { name: "Mburucuyá", g: "m", sci: "Passiflora caerulea", kind: "garden", family: "Passifloraceae", h: 300, sx: 60, sy: 40, sun: "full", water: 5, ph: [6.0, 7.5], rarity: 3, color: "#5B7FB5", life: "Trepadora", pollinator: true, native: true },
+    ceibo:      { name: "Ceibo", g: "m", sci: "Erythrina crista-galli", kind: "garden", family: "Fabaceae", h: 500, sx: 400, sy: 400, sun: "full", water: 5, ph: [5.5, 7.5], rarity: 8, color: "#B5452F", life: "Árbol", pollinator: true, native: true },
+    acacianegra:  { name: "Acacia negra", g: "f", sci: "Gleditsia triacanthos", kind: "garden", family: "Fabaceae", h: 1200, sx: 800, sy: 800, sun: "full", water: 3, ph: [6.0, 8.0], rarity: 1, color: "#4A5638", life: "Árbol", invasiveAR: true },
+    acaciablanca: { name: "Acacia blanca", g: "f", sci: "Robinia pseudoacacia", kind: "garden", family: "Fabaceae", h: 1500, sx: 800, sy: 800, sun: "full", water: 3, ph: [6.0, 8.0], rarity: 1, color: "#8E9E6A", life: "Árbol", invasiveAR: true },
+    tomato:     { name: "Tomate", g: "m", sci: "Solanum lycopersicum", kind: "harvest", family: "Solanaceae", h: 150, sx: 60, sy: 60, sun: "full", water: 7, ph: [6.0, 6.8], rarity: 1, color: "#C8553D", life: "Anual", days: [70, 85] },
+    basil:      { name: "Albahaca", g: "f", sci: "Ocimum basilicum", kind: "harvest", family: "Lamiaceae", h: 40, sx: 30, sy: 30, sun: "full", water: 5, ph: [6.0, 7.5], rarity: 1, color: "#4E9A5B", life: "Anual", days: [50, 60] },
+    lettuce:    { name: "Lechuga", g: "f", sci: "Lactuca sativa", kind: "harvest", family: "Asteraceae", h: 25, sx: 30, sy: 30, sun: "partial", water: 6, ph: [6.0, 7.0], rarity: 1, color: "#86B852", life: "Anual", days: [45, 55] },
+    carrot:     { name: "Zanahoria", g: "f", sci: "Daucus carota subsp. sativus", kind: "harvest", family: "Apiaceae", h: 30, sx: 70, sy: 25, sun: "full", water: 5, ph: [6.0, 7.0], rarity: 1, color: "#D98236", life: "Anual", days: [70, 80], count: 14 },
+    onion:      { name: "Cebolla", g: "f", sci: "Allium cepa", kind: "harvest", family: "Amaryllidaceae", h: 40, sx: 70, sy: 20, sun: "full", water: 4, ph: [6.0, 7.0], rarity: 1, color: "#B49A6E", life: "Bienal", days: [100, 120], count: 10 },
+    pepper:     { name: "Morrón", g: "m", sci: "Capsicum annuum", kind: "harvest", family: "Solanaceae", h: 70, sx: 45, sy: 45, sun: "full", water: 6, ph: [6.0, 6.8], rarity: 1, color: "#D29A2E", life: "Anual", days: [70, 90] },
+    zucchini:   { name: "Zapallito", g: "m", sci: "Cucurbita pepo", kind: "harvest", family: "Cucurbitaceae", h: 60, sx: 100, sy: 100, sun: "full", water: 7, ph: [6.0, 7.5], rarity: 1, color: "#3E7A45", life: "Anual", days: [45, 60] },
+    corn:       { name: "Maíz", g: "m", sci: "Zea mays", kind: "harvest", family: "Poaceae", h: 200, sx: 40, sy: 40, sun: "full", water: 6, ph: [5.8, 7.0], rarity: 1, color: "#D8B640", life: "Anual", days: [80, 100] },
+    beans:      { name: "Chaucha", g: "f", sci: "Phaseolus vulgaris", kind: "harvest", family: "Fabaceae", h: 180, sx: 30, sy: 30, sun: "full", water: 5, ph: [6.0, 7.0], rarity: 1, color: "#6E9A4A", life: "Anual", days: [55, 65] },
+    fennel:     { name: "Hinojo", g: "m", sci: "Foeniculum vulgare", kind: "harvest", family: "Apiaceae", h: 150, sx: 45, sy: 45, sun: "full", water: 4, ph: [6.0, 7.0], rarity: 3, color: "#93B86E", life: "Perenne", days: [80, 90], allelopathic: true },
+    strawberry: { name: "Frutilla", g: "f", sci: "Fragaria × ananassa", kind: "harvest", family: "Rosaceae", h: 20, sx: 120, sy: 40, sun: "full", water: 6, ph: [5.5, 6.8], rarity: 3, color: "#D2475A", life: "Perenne", days: [90, 120], count: 8 },
+  };
+  // Grammar helpers for Spanish copy: article and gendered ending by catalog gender
+  const art = (pid) => CATALOG[pid].g === "m" ? "el" : "la";
+  const gx = (pid) => CATALOG[pid].g === "m" ? "o" : "a";
+  const lc = (pid) => CATALOG[pid].name.toLowerCase();
+  const the = (pid) => `${art(pid)} ${lc(pid)}`;
+  const The = (pid) => `${art(pid) === "el" ? "El" : "La"} ${lc(pid)}`;
+  const dec = (n) => String(n).replace(".", ",");
+
+  /* Pair rules. confidence: documented | traditional */
+  const RELATIONS = [
+    ["tomato", "basil", "good", "La albahaca es una compañera tradicional del tomate y atrae polinizadores.", "traditional"],
+    ["carrot", "onion", "good", "Se dice que el olor de la cebolla confunde a la mosca de la zanahoria, y sus raíces crecen a distinta profundidad.", "traditional"],
+    ["corn", "beans", "good", "La chaucha trepa por el maíz y le suma nitrógeno al suelo.", "documented"],
+    ["tomato", "corn", "bad", "Comparten una plaga: la isoca del maíz también come los frutos del tomate.", "documented"],
+    ["onion", "beans", "bad", "Se dice que la cebolla frena el crecimiento de la chaucha.", "traditional"],
+    ["zucchini", "strawberry", "bad", "Las hojas del zapallito se abren mucho y tapan a las frutillas, que son bajitas.", "documented"],
+  ];
+
+  const EMOJI = {
+    lavender: "💜", rosemary: "🌿", hydrangea: "💐", agapanthus: "🌼", salvia: "🌸", mint: "☘️", stipa: "🌾", azalea: "🌺",
+    passion: "🏵️", ceibo: "🌳", acacianegra: "🌳", acaciablanca: "🌳", tomato: "🍅", basil: "🍃", lettuce: "🥬", carrot: "🥕", onion: "🧅", pepper: "🫑",
+    zucchini: "🥒", corn: "🌽", beans: "🌱", fennel: "🌿", strawberry: "🍓",
+  };
+  // Weather traits: lowFruit rots on wet soil, heatBolt bolts or scorches in heat, frostTender dies under 2 °C, softLeaf tears under hail
+  const TRAITS = {
+    pepper: ["lowFruit", "frostTender"], strawberry: ["lowFruit"], zucchini: ["lowFruit", "frostTender"], tomato: ["lowFruit", "frostTender"],
+    lettuce: ["heatBolt"], basil: ["frostTender", "heatBolt"], hydrangea: ["heatBolt", "softLeaf"], azalea: ["heatBolt", "softLeaf"],
+  };
+  Object.keys(CATALOG).forEach((k) => { CATALOG[k].e = EMOJI[k] || "🌱"; CATALOG[k].traits = TRAITS[k] || []; });
+  const emo = (pid, cls = "") => `<span class="pemo emo ${cls}" style="--c:${CATALOG[pid].color}" aria-hidden="true">${CATALOG[pid].e}</span>`;
+
+  /* Typical sowing months in the Southern Hemisphere (1 = January). Northern Hemisphere shifts by six months. */
+  const SOW_SOUTH = {
+    tomato: [8, 9, 10, 11], basil: [9, 10, 11, 12], lettuce: [1, 2, 3, 4, 5, 8, 9, 10, 11, 12], carrot: [2, 3, 4, 8, 9, 10, 11],
+    onion: [3, 4, 5, 6], pepper: [8, 9, 10], zucchini: [9, 10, 11, 12], corn: [9, 10, 11, 12], beans: [9, 10, 11, 12, 1],
+    fennel: [2, 3, 8, 9], strawberry: [3, 4, 5],
+  };
+  function sowNow() {
+    const m = today.getMonth() + 1, mm = hemi() === "south" ? m : ((m + 5) % 12) + 1;
+    return Object.keys(SOW_SOUTH).filter((k) => SOW_SOUTH[k].includes(mm));
+  }
+  let pendingSearch = null;
+
+  // [name, latitude, inMendozaProvince]
+  const CITIES = [
+    ["Mendoza (Capital), AR", -32.89, true], ["Godoy Cruz, AR", -32.93, true], ["Guaymallén, AR", -32.9, true], ["Las Heras, AR", -32.85, true],
+    ["Luján de Cuyo, AR", -33.04, true], ["Maipú, AR", -32.98, true], ["San Martín, AR", -33.08, true], ["Tunuyán, AR", -33.58, true], ["San Rafael, AR", -34.62, true],
+    ["Córdoba, AR", -31.4], ["Buenos Aires, AR", -34.6], ["Rosario, AR", -32.95], ["Bariloche, AR", -41.1], ["Santiago, CL", -33.45], ["Montevideo, UY", -34.9],
+  ];
+  /* Example data: likely soil pH for Mendoza (mostly alkaline, around 7.5–8.5). The real app would read it from a soil map. */
+  const MENDOZA_EXAMPLE_SOIL_PH = 7.8;
+  const inMendoza = (loc) => !!loc && (loc.name === "Mendoza, AR" || CITIES.some(([n, , mza]) => mza && n === loc.name));
+  const soilPH = () => inMendoza(state.location) ? MENDOZA_EXAMPLE_SOIL_PH : null;
+
+  /* Example 5-day late-spring forecast for Mendoza. The real app reads it from a weather API for the user's location. */
+  const FORECAST = [
+    { d: 0, ic: "sun", hi: 30, lo: 16, rain: 0, sum: "Soleado y seco", chance: 5 },
+    { d: 1, ic: "sun", hi: 35, lo: 20, rain: 0, sum: "Viento Zonda: caliente y muy seco", chance: 5, alert: "Zonda", zonda: true },
+    { d: 2, ic: "cloud", hi: 26, lo: 14, rain: 12, sum: "Tormenta a la tarde, con posible granizo", chance: 70, alert: "Granizo", hail: true },
+    { d: 3, ic: "cloud", hi: 24, lo: 9, rain: 2, sum: "Nublado, alguna llovizna", chance: 30 },
+    { d: 4, ic: "sun", hi: 22, lo: 2, rain: 0, sum: "Soleado, noche muy fría", chance: 5, alert: "Helada" },
+  ];
+
+  const DAY = 864e5;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const daysAgo = (n) => today.getTime() - n * DAY;
+
+  const SEED = () => ({
+    v: 3,
+    mode: "auto",
+    hemisphere: "south",
+    location: { name: "Mendoza, AR", lat: -32.9 },
+    tutorialDone: false,
+    showIssues: true,
+    current: { garden: "front", harvest: "bed" },
+    tasksDone: {},
+    spaces: [
+      { id: "front", kind: "garden", name: "Frente de casa", w: 400, l: 600, depth: null, cell: 10, irrigation: "manguera", plants: [
+        P("hydrangea", 90, 100), P("lavender", 200, 150), P("rosemary", 310, 230), P("agapanthus", 90, 250),
+        P("agapanthus", 180, 275), P("salvia", 285, 295), P("mint", 320, 400), P("stipa", 120, 470),
+        P("stipa", 190, 500), P("lavender", 270, 525),
+      ]},
+      { id: "back", kind: "garden", name: "Fondo", w: 800, l: 250, depth: null, cell: 10, irrigation: "manguera", plants: [
+        P("passion", 60, 40), { ...P("rosemary", 90, 175), sx: 60, sy: 60, h: 80, pot: 45 }, P("azalea", 200, 120), P("azalea", 320, 130), P("lavender", 470, 150), P("salvia", 580, 140), P("stipa", 700, 160),
+      ]},
+      { id: "bed", kind: "harvest", name: "Cantero elevado", w: 120, l: 300, depth: 40, cell: 10, irrigation: "manguera", plants: [
+        P("tomato", 35, 40, 62), P("basil", 88, 40, 40), P("tomato", 35, 125, 62), P("fennel", 95, 140, 40),
+        P("lettuce", 30, 215, 38), P("lettuce", 90, 215, 38), P("carrot", 60, 257, 50), P("onion", 60, 285, 50),
+      ]},
+      { id: "kitchen", kind: "harvest", name: "Huerta", w: 300, l: 400, depth: null, cell: 10, irrigation: "manguera", plants: [
+        P("corn", 50, 60, 55), P("corn", 50, 110, 55), P("corn", 50, 160, 55), P("beans", 110, 80, 50),
+        P("tomato", 240, 80, 30), P("pepper", 130, 290, 45), P("zucchini", 220, 240, 35), P("strawberry", 200, 360, 120),
+        { ...P("basil", 270, 150, 30), pot: 25 }, { ...P("mint", 270, 300), sx: 40, sy: 40, pot: 30 },
+      ]},
+    ],
+  });
+  let uidN = 0;
+  function P(pid, x, y, plantedDaysAgo) {
+    const c = CATALOG[pid];
+    const p = { uid: "p" + (++uidN) + Math.random().toString(36).slice(2, 6), pid, x, y, sx: c.sx, sy: c.sy, h: c.h };
+    if (c.count) p.count = c.count;
+    if (plantedDaysAgo != null) p.planted = daysAgo(plantedDaysAgo);
+    return p;
+  }
+
+  /* ---------- State ---------- */
+  const KEY = "saphi-proto-v1";
+  let state;
+  try { state = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) { state = null; }
+  const EXTRA = () => ({ location: null, season: "today", showShadows: false, sunStudy: {}, precDone: {}, tutorialDone: false });
+  if (!state || state.v !== 3 || !Array.isArray(state.spaces)) state = SEED();
+  state = Object.assign(EXTRA(), state);
+  const photos = {}; // object URLs of sun-study photos, kept in memory only
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* storage unavailable: keep in memory */ } };
+  const history = {};
+  let selected = null;
+
+  const $ = (s, el = document) => el.querySelector(s);
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const icon = (id, cls = "") => `<svg class="ic ${cls}" aria-hidden="true"><use href="#i-${id}"/></svg>`;
+  const spaceById = (id) => state.spaces.find((s) => s.id === id);
+  const currentSpace = (kind) => spaceById(state.current[kind]) || state.spaces.find((s) => s.kind === kind);
+  const m = (cm) => (cm / 100).toFixed(cm % 100 === 0 ? 1 : 2).replace(/0$/, "");
+  const fmtM = (cm) => (cm / 100).toLocaleString("es-AR", { maximumFractionDigits: 2, minimumFractionDigits: 1 });
+  const fmt1 = (n) => n.toLocaleString("es-AR", { maximumFractionDigits: 1, minimumFractionDigits: 1 });
+  const cap = (s) => s ? s[0].toUpperCase() + s.slice(1) : s;
+  const irrigationOf = (sp) => sp.irrigation === "goteo" ? "goteo" : "manguera";
+  const waterAvg = (sp) => sp.plants.length ? sp.plants.reduce((a, p) => a + CATALOG[p.pid].water, 0) / sp.plants.length : null;
+
+  /* ---------- Theme by local time ---------- */
+  function resolvedMode() {
+    if (state.mode !== "auto") return state.mode;
+    const h = new Date().getHours();
+    return h >= 7 && h < 19 ? "day" : "night";
+  }
+  document.documentElement.lang = "es-AR";
+  function applyMode() { document.documentElement.dataset.mode = resolvedMode(); }
+  applyMode();
+  setInterval(applyMode, 60000);
+
+  /* ---------- Geometry and rules ---------- */
+  const rAt = (p, dx, dy) => { // ellipse radius toward direction (dx, dy)
+    const a = p.sx / 2, b = p.sy / 2, d = Math.hypot(dx, dy) || 1;
+    const c = dx / d, s = dy / d;
+    return (a * b) / Math.sqrt((b * c) ** 2 + (a * s) ** 2);
+  };
+  const gapBetween = (A, B) => {
+    const dx = B.x - A.x, dy = B.y - A.y, d = Math.hypot(dx, dy);
+    return d - rAt(A, dx, dy) - rAt(B, -dx, -dy);
+  };
+  const relationOf = (a, b) => RELATIONS.find((r) => (r[0] === a && r[1] === b) || (r[0] === b && r[1] === a));
+
+  function computeIssues(space) {
+    const out = [];
+    const ps = space.plants;
+    const soil = soilPH();
+    // Single-plant issues (a === b): invasive species in Argentina, and acid-loving plants in alkaline ground
+    for (const P1 of ps) {
+      const c = CATALOG[P1.pid];
+      if (c.invasiveAR) out.push({ a: P1.uid, b: P1.uid, sev: "crit", type: "Invasora en Argentina", conf: "Documentado",
+        text: `${The(P1.pid)} se dispersa sola por semillas y rebrotes, y desplaza a las especies nativas. Mejor elegí una alternativa no invasora, como un ceibo.` });
+      // Only acid-loving plants (hydrangea, azalea); most crops tolerate mildly alkaline soil
+      if (soil && !P1.pot && c.ph[1] < 6.6) out.push({ a: P1.uid, b: P1.uid, sev: "warn", type: "Suelo alcalino", conf: "Estimado", fix: P1.uid,
+        text: `Tu suelo probable es alcalino (pH ${dec(soil)}) y ${the(P1.pid)} prefiere pH ${dec(c.ph[0])}–${dec(c.ph[1])}. Ponel${gx(P1.pid)} en maceta con sustrato ácido.` });
+    }
+    for (let i = 0; i < ps.length; i++) {
+      for (let j = i + 1; j < ps.length; j++) {
+        const A = ps[i], B = ps[j], cA = CATALOG[A.pid], cB = CATALOG[B.pid];
+        const gap = gapBetween(A, B);
+        if (gap < -2) out.push({ a: A.uid, b: B.uid, sev: "crit", type: "Muy juntas", conf: "Medido",
+          text: `${The(A.pid)} y ${the(B.pid)} se pisan ${Math.round(-gap)} cm cuando crecen del todo. Dales más espacio o achicá su tamaño.` });
+        // A pot keeps roots and soil separate, so root-level conflicts do not apply
+        const rootsApart = !!(A.pot || B.pot);
+        if ((cA.invasive || cB.invasive) && gap < 60 && A.pid !== B.pid) {
+          const invP = cA.invasive ? A : B, otherP = cA.invasive ? B : A;
+          if (!invP.pot) out.push({ a: A.uid, b: B.uid, sev: "crit", type: "Invasora", conf: "Documentado", fix: invP.uid,
+            text: `${The(invP.pid)} se expande con estolones bajo tierra y puede invadir ${the(otherP.pid)}. Plantal${gx(invP.pid)} en maceta o detrás de una barrera de raíces.` });
+        }
+        if ((cA.allelopathic || cB.allelopathic) && gap < 30 && A.pid !== B.pid && !rootsApart) {
+          const alP = cA.allelopathic ? A : B, otherP = cA.allelopathic ? B : A;
+          out.push({ a: A.uid, b: B.uid, sev: "warn", type: "Competencia", conf: "Tradicional", fix: alP.uid,
+            text: `${The(alP.pid)} frena el crecimiento de las plantas cercanas, como ${the(otherP.pid)}. Dale su propio rincón o una maceta.` });
+        }
+        if ((cA.ph[1] < cB.ph[0] || cB.ph[1] < cA.ph[0]) && gap < 80 && !rootsApart) {
+          const small = A.sx * A.sy <= B.sx * B.sy ? A : B;
+          out.push({ a: A.uid, b: B.uid, sev: "warn", type: "pH del suelo", conf: "Documentado", fix: small.uid,
+            text: `${The(A.pid)} prefiere pH ${dec(cA.ph[0])}–${dec(cA.ph[1])} y ${the(B.pid)} prefiere ${dec(cB.ph[0])}–${dec(cB.ph[1])}. Necesitan tierras distintas, o una de las dos en maceta con su propia mezcla.` });
+        }
+        const rel = relationOf(A.pid, B.pid);
+        if (rel && gap < 60) out.push({ a: A.uid, b: B.uid, sev: rel[2] === "good" ? "good" : "warn", type: rel[2] === "good" ? "Buenos vecinos" : "Malos vecinos", conf: rel[4] === "documented" ? "Documentado" : "Tradicional", text: rel[3] });
+        shade(A, B, out); shade(B, A, out);
+      }
+    }
+    return out;
+  }
+  /* ---------- Sun ---------- */
+  const hemi = () => state.location ? (state.location.lat < 0 ? "south" : "north") : state.hemisphere;
+  const latitude = () => state.location ? state.location.lat : (state.hemisphere === "south" ? -34.6 : 40.4);
+  function seasonDate() {
+    const y = today.getFullYear();
+    if (state.season === "winter") return new Date(y, hemi() === "south" ? 5 : 11, 21);
+    if (state.season === "summer") return new Date(y, hemi() === "south" ? 11 : 5, 21);
+    return today;
+  }
+  function noonElevation() {
+    const d = seasonDate();
+    const n = Math.round((d - new Date(d.getFullYear(), 0, 0)) / DAY);
+    const decl = 23.44 * Math.sin((2 * Math.PI * (284 + n)) / 365);
+    return clamp(90 - Math.abs(latitude() - decl), 5, 90);
+  }
+  const shadowLen = (h) => Math.round(h / Math.tan((noonElevation() * Math.PI) / 180));
+  const seasonLabel = () => ({ today: "hoy", winter: "en pleno invierno", summer: "en pleno verano" }[state.season]);
+
+  function shade(T, S, out) { // T is tall, S might be shaded at solar noon
+    const cS = CATALOG[S.pid], cT = CATALOG[T.pid];
+    if (cS.sun !== "full" || T.h < S.h * 1.5) return;
+    const sunFromTop = hemi() === "south"; // southern hemisphere: sun from the north, which is the top edge
+    const ahead = sunFromTop ? S.y - T.y : T.y - S.y;
+    if (ahead <= 0) return;
+    const overlapX = Math.abs(S.x - T.x) < T.sx / 2 + S.sx / 4;
+    const dist = ahead - T.sy / 2 - S.sy / 2;
+    const len = shadowLen(T.h);
+    if (overlapX && dist < len) out.push({ a: T.uid, b: S.uid, sev: "warn", type: "Sombra", conf: "Estimado",
+      text: `Al mediodía ${seasonLabel()}, ${the(T.pid)} (${T.h} cm) da ${len} cm de sombra sobre ${the(S.pid)}, que necesita sol pleno. Corré una de las dos: las plantas altas van del lado ${sunFromTop ? "sur" : "norte"}.` });
+  }
+  const problemCount = (issues) => issues.filter((i) => i.sev !== "good").length;
+
+  function freeSoil(space) {
+    const c = Math.max(10, Math.ceil(Math.sqrt((space.w * space.l) / 20000)));
+    let tot = 0, cov = 0;
+    for (let y = c / 2; y < space.l; y += c) for (let x = c / 2; x < space.w; x += c) {
+      tot++;
+      for (const p of space.plants) { const dx = (x - p.x) / (p.sx / 2), dy = (y - p.y) / (p.sy / 2); if (dx * dx + dy * dy <= 1) { cov++; break; } }
+    }
+    const pct = tot ? Math.round(((tot - cov) / tot) * 100) : 100;
+    return { pct, m2: ((space.w * space.l) / 1e4) * (pct / 100) };
+  }
+
+  function findFreeSpot(space, sx, sy) {
+    const probe = { sx, sy };
+    const step = space.cell;
+    for (let y = sy / 2; y <= space.l - sy / 2; y += step) for (let x = sx / 2; x <= space.w - sx / 2; x += step) {
+      probe.x = x; probe.y = y;
+      if (space.plants.every((p) => gapBetween(probe, p) >= 0)) return { x: snap(x, step), y: snap(y, step), ok: true };
+    }
+    return { x: snap(space.w / 2, step), y: snap(space.l / 2, step), ok: false };
+  }
+  const snap = (v, c) => Math.round(v / c) * c;
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+
+  /* ---------- History ---------- */
+  function pushHistory(space) {
+    const h = (history[space.id] = history[space.id] || []);
+    h.push(JSON.stringify(space.plants));
+    if (h.length > 40) h.shift();
+  }
+  function undo(space) {
+    const h = history[space.id];
+    if (!h || !h.length) return;
+    space.plants = JSON.parse(h.pop());
+    selected = null; save(); closeSheet(true); drawSpace(space.kind); toast("Cambio deshecho");
+  }
+
+  /* ---------- Sandbox SVG ---------- */
+  function sandboxSVG(space, scale, opts = {}) {
+    const mini = !!opts.mini;
+    const pad = mini ? { l: 2 / scale, t: 2 / scale, r: 2 / scale, b: 2 / scale } : { l: 26 / scale, t: 22 / scale, r: 4 / scale, b: 4 / scale };
+    const W = space.w, L = space.l;
+    const vbW = W + pad.l + pad.r, vbH = L + pad.t + pad.b;
+    const px = 1 / scale; // one screen pixel in cm
+    const id = "g" + space.id + (mini ? "m" : "");
+    const issues = mini ? [] : computeIssues(space);
+    const showMinor = space.cell * scale >= 5;
+    let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${-pad.l} ${-pad.t} ${vbW} ${vbH}" width="${Math.round(vbW * scale)}" height="${Math.round(vbH * scale)}" role="img" aria-label="${esc(space.name)}, ${fmtM(W)} por ${fmtM(L)} metros, ${space.plants.length} plantas">`;
+    s += `<defs>`;
+    if (showMinor) s += `<pattern id="${id}n" width="${space.cell}" height="${space.cell}" patternUnits="userSpaceOnUse"><path d="M${space.cell} 0H0V${space.cell}" fill="none" stroke="var(--bed-line)" stroke-width="${px}"/></pattern>`;
+    s += `<pattern id="${id}M" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M100 0H0V100" fill="none" stroke="var(--bed-major)" stroke-width="${px}"/></pattern>`;
+    s += `</defs>`;
+    const rr = (mini ? 3 : 8) * px;
+    s += `<rect x="0" y="0" width="${W}" height="${L}" rx="${rr}" fill="var(--bed)"/>`;
+    if (!mini) {
+      if (showMinor) s += `<rect x="0" y="0" width="${W}" height="${L}" rx="${rr}" fill="url(#${id}n)"/>`;
+      s += `<rect x="0" y="0" width="${W}" height="${L}" rx="${rr}" fill="url(#${id}M)"/>`;
+    }
+    s += `<rect x="0" y="0" width="${W}" height="${L}" rx="${rr}" fill="none" stroke="var(--bed-edge)" stroke-width="${1.5 * px}"/>`;
+    if (!mini) {
+      const fs = 10 * px;
+      const stepM = W * scale < 200 ? Math.max(100, Math.ceil(W / 3 / 100) * 100) : 100;
+      for (let x = 0; x <= W; x += stepM) s += `<text class="ruler" x="${x}" y="${-8 * px}" font-size="${fs}" text-anchor="${x === 0 ? "start" : "middle"}">${x / 100}${x === 0 ? "" : " m"}</text>`;
+      const stepY = L * scale < 200 ? Math.max(100, Math.ceil(L / 3 / 100) * 100) : 100;
+      for (let y = stepY; y <= L; y += stepY) s += `<text class="ruler" x="${-6 * px}" y="${y + 3.5 * px}" font-size="${fs}" text-anchor="end">${y / 100}</text>`;
+      // north marker
+      s += `<g transform="translate(${W - 14 * px} ${14 * px})" opacity=".8"><circle r="${9 * px}" fill="var(--glass-strong)" stroke="var(--bed-edge)" stroke-width="${px}"/><path d="M0 ${-5 * px} L${3.2 * px} ${3 * px} L0 ${1.5 * px} L${-3.2 * px} ${3 * px}Z" fill="var(--soil)"/></g>`;
+      s += `<text class="ruler" x="${W - 14 * px}" y="${34 * px}" font-size="${fs}" text-anchor="middle">N</text>`;
+    }
+    // noon shadow layer
+    if (!mini && state.showShadows) {
+      const dir = hemi() === "south" ? 1 : -1;
+      s += `<g class="issue-layer" opacity=".9">`;
+      for (const p of space.plants) {
+        const len = Math.min(shadowLen(p.h), space.l * 2);
+        s += `<ellipse cx="${p.x}" cy="${p.y + dir * len / 2}" rx="${p.sx / 2}" ry="${p.sy / 2 + len / 2}" fill="var(--ink)" fill-opacity=".09"/>`;
+      }
+      s += `</g>`;
+    }
+    // issue layer
+    if (!mini && state.showIssues) {
+      s += `<g class="issue-layer">`;
+      const byPlant = {};
+      for (const it of issues) {
+        const A = space.plants.find((p) => p.uid === it.a), B = space.plants.find((p) => p.uid === it.b);
+        const col = it.sev === "good" ? "var(--good)" : it.sev === "crit" ? "var(--crit)" : "var(--warn)";
+        // single-plant issues get only the attention badge, no line
+        if (it.a !== it.b) s += `<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" stroke="${col}" stroke-width="${2 * px}" stroke-dasharray="${it.sev === "good" ? `${1 * px} ${4 * px}` : `${6 * px} ${4 * px}`}" stroke-linecap="round"/>`;
+        if (it.sev !== "good") for (const u of [it.a, it.b]) byPlant[u] = byPlant[u] === "crit" ? "crit" : it.sev;
+      }
+      s += `</g>`;
+      opts.flags = byPlant;
+    }
+    // plants, larger first so small ones stay on top
+    const order = [...space.plants].sort((a, b) => b.sx * b.sy - a.sx * a.sy);
+    for (const p of order) {
+      const c = CATALOG[p.pid];
+      const flag = opts.flags && opts.flags[p.uid];
+      s += `<g class="pl" data-uid="${p.uid}" transform="translate(${p.x} ${p.y})"${mini ? "" : ` tabindex="0" role="button" aria-label="${esc(c.name)}, ${p.sx} por ${p.sy} cm${p.pot ? `, en maceta de ${p.pot} cm` : ""}${flag ? ", necesita atención" : ""}"`}>`;
+      if (p.pot) { // terracotta pot seen from above: soft drop shadow, rim, inner lip, soil
+        const R = p.pot / 2, rim = Math.max(3 * px, Math.min(p.pot * 0.09, 6 * px));
+        s += `<circle cy="${2 * px}" r="${R + px}" fill="#000" fill-opacity=".16"/>`;
+        s += `<circle r="${R - rim / 2}" fill="var(--pot-soil)" stroke="var(--pot)" stroke-width="${rim}"/>`;
+        if (!mini) s += `<circle r="${Math.max(R - rim - 0.8 * px, px)}" fill="none" stroke="var(--pot)" stroke-opacity=".45" stroke-width="${0.8 * px}"/>`;
+      }
+      s += `<ellipse class="body" rx="${p.sx / 2}" ry="${p.sy / 2}" fill="${c.color}" fill-opacity=".24" stroke="${c.color}" stroke-width="${(mini ? 1 : 1.5) * px}"/>`;
+      if (!mini) {
+        if (selected === p.uid) s += `<ellipse class="sel-ring" rx="${p.sx / 2 + 5 * px}" ry="${p.sy / 2 + 5 * px}" stroke-width="${2 * px}"/>`;
+        s += `<circle r="${Math.max(2.5 * px, Math.min(p.sx, p.sy) * 0.07)}" fill="${c.color}"/>`;
+        const wpx = Math.min(p.sx, p.sy) * scale;
+        if (wpx >= 30) {
+          const label = c.name.length > 11 && wpx < 80 ? c.name.split(" ")[0] : c.name;
+          s += `<text y="${Math.min(p.sy / 2 - 5 * px, 16 * px)}" font-size="${10.5 * px}" stroke-width="${3 * px}" text-anchor="middle">${esc(label)}${p.count ? ` ×${p.count}` : ""}</text>`;
+        }
+        if (flag) { // attention badge on the upper-right edge of the canopy
+          const bx = (p.sx / 2) * 0.72, by = -(p.sy / 2) * 0.72;
+          s += `<g transform="translate(${bx} ${by})"><circle r="${7 * px}" fill="var(--${flag})" stroke="var(--bed)" stroke-width="${1.5 * px}"/><path d="M0 ${-3.6 * px}V${0.8 * px}M0 ${3.2 * px}v${0.1 * px}" stroke="var(--paper)" stroke-width="${1.8 * px}" stroke-linecap="round"/></g>`;
+        }
+      }
+      s += `</g>`;
+    }
+    s += `</svg>`;
+    return s;
+  }
+
+  function stageScale(space, stage) {
+    const aw = stage.clientWidth || 300;
+    const ah = Math.max(240, Math.min(window.innerHeight * 0.5, 520));
+    return Math.min((aw - 30) / space.w, (ah - 26) / space.l);
+  }
+
+  function drawSandbox(space) {
+    const stage = $("#stage");
+    if (!stage) return;
+    const scale = stageScale(space, stage);
+    stage.innerHTML = sandboxSVG(space, scale);
+    stage._scale = scale;
+    bindSandbox(space, stage.querySelector("svg"));
+  }
+
+  function bindSandbox(space, svg) {
+    let drag = null;
+    const toCm = (e) => { const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; return pt.matrixTransform(svg.getScreenCTM().inverse()); };
+    svg.addEventListener("pointerdown", (e) => {
+      const g = e.target.closest(".pl"); if (!g) return;
+      const p = space.plants.find((q) => q.uid === g.dataset.uid); if (!p) return;
+      const at = toCm(e);
+      drag = { g, p, dx: at.x - p.x, dy: at.y - p.y, sx: e.clientX, sy: e.clientY, moved: false, nx: p.x, ny: p.y };
+      g.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    svg.addEventListener("pointermove", (e) => {
+      if (!drag) return;
+      if (!drag.moved && Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) < 4) return;
+      if (!drag.moved) { drag.moved = true; svg.classList.add("dragging"); }
+      const at = toCm(e);
+      const { p } = drag;
+      drag.nx = clamp(snap(at.x - drag.dx, space.cell), Math.min(p.sx / 2, space.w / 2), Math.max(space.w - p.sx / 2, space.w / 2));
+      drag.ny = clamp(snap(at.y - drag.dy, space.cell), Math.min(p.sy / 2, space.l / 2), Math.max(space.l - p.sy / 2, space.l / 2));
+      drag.g.setAttribute("transform", `translate(${drag.nx} ${drag.ny})`);
+    });
+    const end = () => {
+      if (!drag) return;
+      const d = drag; drag = null;
+      if (d.moved) {
+        if (d.nx !== d.p.x || d.ny !== d.p.y) { pushHistory(space); d.p.x = d.nx; d.p.y = d.ny; save(); }
+        drawSpace(space.kind, { keepSheet: true });
+        if (selected === d.p.uid) refreshPlantIssues(space);
+      } else {
+        openPlant(space, d.p.uid);
+      }
+    };
+    svg.addEventListener("pointerup", end);
+    svg.addEventListener("pointercancel", end);
+    svg.addEventListener("keydown", (e) => {
+      const g = e.target.closest(".pl"); if (!g) return;
+      const p = space.plants.find((q) => q.uid === g.dataset.uid);
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openPlant(space, p.uid); return; }
+      const mv = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
+      if (!mv) return;
+      e.preventDefault();
+      pushHistory(space);
+      p.x = clamp(p.x + mv[0] * space.cell, p.sx / 2, space.w - p.sx / 2);
+      p.y = clamp(p.y + mv[1] * space.cell, p.sy / 2, space.l - p.sy / 2);
+      save(); drawSpace(space.kind, { keepSheet: true });
+      const again = document.querySelector(`.pl[data-uid="${p.uid}"]`); if (again) again.focus();
+    });
+  }
+
+  /* ---------- Views ---------- */
+  const view = $("#view");
+  const ROUTES = ["home", "garden", "harvest", "profile"];
+  const route = () => { const h = location.hash.replace("#", ""); return ROUTES.includes(h) ? h : "home"; };
+
+  function render() {
+    const r = route();
+    selected = null; closeSheet(true);
+    document.querySelectorAll(".nav a").forEach((a) => { if (a.dataset.view === r) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+    view.style.animation = "none"; void view.offsetWidth; view.style.animation = "";
+    if (r === "home") renderHome();
+    else if (r === "profile") renderProfile();
+    else renderSpace(r);
+    $("#screens").scrollTop = 0;
+  }
+
+  function greeting() { const h = new Date().getHours(); return h < 12 ? "Buen día" : h < 19 ? "Buenas tardes" : "Buenas noches"; }
+
+  function harvestRows() {
+    const rows = [];
+    for (const sp of state.spaces.filter((s) => s.kind === "harvest")) {
+      const seen = {};
+      for (const p of sp.plants) {
+        const c = CATALOG[p.pid];
+        if (!c.days || !p.planted || seen[p.pid]) continue;
+        seen[p.pid] = true;
+        const age = Math.round((today.getTime() - p.planted) / DAY);
+        const left = c.days[0] - age;
+        rows.push({ sp, p, c, age, left, pct: clamp(age / c.days[0], 0, 1) });
+      }
+    }
+    return rows.sort((a, b) => a.left - b.left);
+  }
+
+  function tasks() {
+    const t = [];
+    const bed = spaceById("bed");
+    if (bed) t.push({ id: "water-bed", title: irrigationOf(bed) === "goteo" ? "Revisá el goteo del cantero" : "Regá el cantero con manguera",
+      meta: `Tomates y lechugas · ${irrigationOf(bed) === "goteo" ? "que no haya goteros tapados" : "antes de las 10"}`, go: "harvest", space: "bed" });
+    for (const sp of state.spaces) {
+      const iss = computeIssues(sp).filter((i) => i.type === "Invasora");
+      if (iss.length) { t.push({ id: "inv-" + sp.id, title: "Revisá los estolones de la menta", meta: `${sp.name} · se está expandiendo hacia sus vecinas`, go: sp.kind, space: sp.id }); break; }
+    }
+    const soon = harvestRows().find((r) => r.left > 0 && r.left <= 14);
+    if (soon) t.push({ id: "soon-" + soon.p.pid, title: `${soon.c.name}: list${gx(soon.p.pid)} en ${soon.left} días`, meta: `${soon.sp.name} · planificá la cosecha`, go: "harvest", space: soon.sp.id });
+    t.push({ id: "feed-tomato", title: "Aboná los tomates", meta: `${bed ? bed.name : "Cantero elevado"} · cada 14 días`, go: "harvest", space: "bed" });
+    const key = today.toISOString().slice(0, 10);
+    return t.map((x) => ({ ...x, done: !!(state.tasksDone[key] || {})[x.id], key }));
+  }
+
+  function renderHome() {
+    const ts = tasks();
+    const left = ts.filter((t) => !t.done).length;
+    const mode = resolvedMode();
+    const dateStr = cap(new Date().toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" }));
+    const spaces = state.spaces;
+    view.innerHTML = `
+      <header class="greet">
+        <div><h1>${greeting()}</h1><p class="muted">${dateStr} · ${left ? `${left} ${left === 1 ? "tarea" : "tareas"} para hoy` : "Todo listo por hoy"}</p></div>
+        <button class="icon-btn glass" data-act="cycle-mode" aria-label="Tema: ${state.mode === "auto" ? "automático según la hora local" : mode === "day" ? "día" : "noche"}">${icon(state.mode === "auto" ? "auto" : mode === "day" ? "sun" : "moon")}</button>
+      </header>
+
+      <section class="section" aria-labelledby="today-h">
+        <div class="section-head"><h2 id="today-h">Hoy</h2><span class="faint num">${ts.length - left}/${ts.length}</span></div>
+        <div class="panel glass">
+          ${ts.map((t) => `
+            <div class="row ${t.done ? "task-done" : ""}">
+              <button class="check" role="checkbox" aria-checked="${t.done}" aria-label="Marcar “${esc(t.title)}” como hecha" data-act="task" data-id="${t.id}">${icon("check", "sm")}</button>
+              <div class="grow"><h3>${esc(t.title)}</h3><p>${esc(t.meta)}</p></div>
+              <a class="icon-btn" href="#${t.go}" data-space="${t.space}" aria-label="Abrir ${esc(t.meta.split(" · ")[0])}">${icon("chev", "sm")}</a>
+            </div>`).join("")}
+        </div>
+      </section>
+
+      <section class="streak glass" aria-label="Racha de cuidado">
+        <div class="flame">${icon("flame")}</div>
+        <div style="flex:1;min-width:0">
+          <h3>6 semanas seguidas cuidando</h3>
+          <p class="muted" style="font-size:13px">Terminá las tareas de esta semana para llegar a 7.</p>
+          <div class="weeks" aria-hidden="true">${[1, 1, 1, 0, 1, 1, 1, 1].map((on, i) => `<i class="${i === 7 ? "now" : on ? "on" : ""}"></i>`).join("")}</div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="spaces-h">
+        <div class="section-head"><h2 id="spaces-h">Tus espacios</h2><span class="faint">${spaces.length}</span></div>
+        <div class="spaces">
+          ${spaces.map((sp) => {
+            const n = problemCount(computeIssues(sp));
+            return `<a class="space-card glass" href="#${sp.kind}" data-space="${sp.id}" style="text-decoration:none;color:inherit">
+              <div class="thumb">${sandboxSVG(sp, Math.min(140 / sp.w, 104 / sp.l), { mini: true })}</div>
+              <div><h3>${esc(sp.name)}</h3><div class="meta"><span class="mono faint">${fmtM(sp.w)} × ${fmtM(sp.l)} m</span>${n ? `<span class="pill warn">${n}</span>` : `<span class="pill good">${icon("check", "sm")}</span>`}</div></div>
+            </a>`;
+          }).join("")}
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="sow-h">
+        <div class="section-head"><h2 id="sow-h">Sembrá en ${today.toLocaleDateString("es-AR", { month: "long" })}</h2><span class="faint" style="font-size:13px">Hemisferio ${hemi() === "south" ? "Sur" : "Norte"}</span></div>
+        <div class="sow">
+          ${sowNow().map((k) => `<button class="glass" data-act="sow" data-name="${esc(CATALOG[k].name)}"><span class="swatch" style="--c:${CATALOG[k].color}"></span>${CATALOG[k].name}</button>`).join("")}
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="wx-h">
+        <div class="section-head"><h2 id="wx-h">Clima</h2><span class="example">Pronóstico de ejemplo</span></div>
+        <div class="panel glass">
+          <div class="forecast">
+            ${FORECAST.map((f) => `<button class="fday ${f.alert ? "alert" : ""}" data-act="day" data-d="${f.d}" aria-label="${cap(dayLong(f.d))}: ${f.sum}, máxima ${f.hi} y mínima ${f.lo} grados${f.alert ? `, ${alertTitle(f.alert).toLowerCase()}` : ""}"><b>${f.d === 0 ? "Hoy" : dayShort(f.d)}</b>${icon(f.ic)}<span class="num">${f.hi}° / ${f.lo}°</span>${f.alert ? `<span class="tag">${f.alert}</span>` : `<span class="num">${f.rain ? `${f.rain} mm` : "Seco"}</span>`}</button>`).join("")}
+          </div>
+          ${precautions().map((p) => `
+            <div class="row prec ${state.precDone[p.id] ? "task-done" : ""}">
+              <button class="check" role="checkbox" aria-checked="${!!state.precDone[p.id]}" aria-label="Marcar “${esc(p.title)}” como hecha" data-act="prec" data-id="${p.id}">${icon("check", "sm")}</button>
+              <div class="grow"><h3>${esc(p.title)}</h3><p>${esc(p.text)}</p>${p.pids.length ? `<div class="facts" style="margin-top:8px">${p.pids.map((x) => `<span class="pill" style="background:color-mix(in srgb, ${CATALOG[x].color} 16%, transparent);color:var(--ink)"><span class="swatch" style="--c:${CATALOG[x].color};width:8px;height:8px"></span>${CATALOG[x].name}</span>`).join("")}</div>` : ""}</div>
+            </div>`).join("")}
+        </div>
+      </section>`;
+  }
+
+  const dayShort = (d) => cap(new Date(today.getTime() + d * DAY).toLocaleDateString("es-AR", { weekday: "short" }).replace(".", ""));
+  const weekday = (d) => new Date(today.getTime() + d * DAY).toLocaleDateString("es-AR", { weekday: "long" });
+  const dayLong = (d) => d === 0 ? "hoy" : d === 1 ? "mañana" : weekday(d);
+  const onDay = (d) => d === 0 ? "hoy" : d === 1 ? "mañana" : `el ${weekday(d)}`;
+  const beforeDay = (d) => d === 0 ? "hoy mismo" : d === 1 ? "antes de mañana" : `antes del ${weekday(d)}`;
+  const nightOf = (d) => d === 0 ? "esta noche" : d === 1 ? "mañana a la noche" : `el ${weekday(d)} a la noche`;
+  const alertTitle = (a) => `Alerta de ${a === "Zonda" ? "Zonda" : a.toLowerCase()}`;
+  function plantsWith(trait) {
+    const ids = new Set();
+    state.spaces.forEach((s) => s.plants.forEach((p) => { if (CATALOG[p.pid].traits.includes(trait)) ids.add(p.pid); }));
+    return [...ids];
+  }
+  const ALERT_WHY = {
+    Granizo: "Está en ámbar porque hay chance de tormenta con granizo, que en pocos minutos rompe hojas, flores y frutos.",
+    Zonda: "Está en ámbar porque se espera viento Zonda, caliente y muy seco, que deshidrata las plantas en pocas horas.",
+    Helada: "Está en ámbar porque la mínima baja a 2 °C o menos, y las plantas sensibles al frío pueden morir en una noche.",
+    Lluvia: "Está en ámbar porque se esperan más de 20 mm de lluvia: los frutos bajos se pueden pudrir y las macetas, inundar.",
+    Calor: "Está en ámbar porque pasa los 32 °C: los cultivos de hoja se pueden espigar y las hojas blandas, quemar.",
+  };
+  function openDay(d) {
+    const f = FORECAST.find((x) => x.d === d); if (!f) return;
+    const precs = precautions().filter((p) => p.d === d);
+    openSheet(`
+      <div class="sh-head"><span class="pemo" style="--c:var(--leaf)">${icon(f.ic)}</span><div class="grow"><h2>${cap(dayLong(f.d))}</h2><p class="muted">${f.sum}</p></div><button class="icon-btn" data-act="close" aria-label="Cerrar">${icon("x")}</button></div>
+      <div class="trio glass">
+        <div><b class="num">${f.hi}°</b><span>Máxima</span></div>
+        <div><b class="num">${f.lo}°</b><span>Mínima</span></div>
+        <div><b class="num">${f.rain ? f.rain : 0}</b><span>mm de lluvia · ${f.chance}%</span></div>
+      </div>
+      ${f.alert ? `<div class="issue warn">${icon("alert")}<div class="grow"><b>${alertTitle(f.alert)}</b><span>${ALERT_WHY[f.alert] || ""}</span></div></div>` : ""}
+      ${precs.length ? `<div class="section"><h3>Qué hacer</h3><div class="issues">${precs.map((p) => `<div class="issue good">${icon("sprout")}<div class="grow"><b>${esc(p.title)}</b><span>${esc(p.text)}</span></div></div>`).join("")}</div></div>` : `<p class="muted">Ese día tus plantas no necesitan nada especial.</p>`}
+      ${f.d >= 3 ? `<p class="faint" style="font-size:12px">Los pronósticos a tantos días cambian seguido. Saphi los vuelve a revisar todas las mañanas.</p>` : ""}`);
+  }
+
+  function precautions() {
+    const out = [];
+    const rain = FORECAST.find((f) => f.rain >= 20), heat = FORECAST.find((f) => f.hi >= 32), frost = FORECAST.find((f) => f.lo <= 2);
+    const hail = FORECAST.find((f) => f.hail), zonda = FORECAST.find((f) => f.zonda);
+    if (hail) {
+      // every crop in a harvest space, plus soft-leaved ornamentals
+      const ids = new Set();
+      state.spaces.forEach((s) => s.plants.forEach((p) => { if (s.kind === "harvest" || CATALOG[p.pid].traits.includes("softLeaf")) ids.add(p.pid); }));
+      if (ids.size) out.push({ id: "hail-" + hail.d, pids: [...ids], d: hail.d,
+        title: `Cubrí la huerta y las plantas delicadas con tela antigranizo o media sombra ${beforeDay(hail.d)}`,
+        text: `${hail.chance}% de probabilidad de tormenta con granizo. Las hojas tiernas y los frutos se rompen con el golpe.` });
+    }
+    if (zonda) {
+      const potted = new Set();
+      state.spaces.forEach((s) => s.plants.forEach((p) => { if (p.pot) potted.add(p.pid); }));
+      out.push({ id: "zonda-" + zonda.d, pids: [...potted], d: zonda.d,
+        title: "Regá temprano y protegé del viento caliente las plantas jóvenes y las que están en maceta",
+        text: `Zonda ${onDay(zonda.d)}, con hasta ${zonda.hi} °C y aire muy seco. La tierra de las macetas se seca en pocas horas.` });
+    }
+    if (rain) {
+      const low = plantsWith("lowFruit");
+      if (low.length) out.push({ id: "rain-fruit-" + rain.d, pids: low, d: rain.d, title: `Levantá los frutos del suelo ${beforeDay(rain.d)}`,
+        text: `Se esperan ${rain.rain} mm de lluvia. Los morrones, tomates y frutillas apoyados en tierra mojada se pueden pudrir. Poné paja abajo o atá las ramas bajas.` });
+    }
+    // Only when the week brings meaningful rain; it never tells the user to stop watering
+    const total = FORECAST.reduce((a, f) => a + f.rain, 0);
+    if (total >= 20) {
+      const wettest = FORECAST.reduce((a, f) => (f.rain > a.rain ? f : a), FORECAST[0]);
+      out.push({ id: "rain-water-" + wettest.d, pids: [], d: wettest.d, title: "Regá menos esta semana",
+        text: `Se esperan unos ${total} mm de lluvia. Antes de regar, tocá la tierra: si está húmeda a 2 cm, esperá un día. Fijate que las macetas drenen bien.` });
+    }
+    if (heat) {
+      const hs = plantsWith("heatBolt");
+      if (hs.length) out.push({ id: "heat-" + heat.d, pids: hs, d: heat.d, title: `Protegé del calor ${onDay(heat.d)}`,
+        text: `Se esperan ${heat.hi} °C. La lechuga se puede espigar y las hojas de la hortensia, quemar. Regá temprano y poné media sombra a la tarde.` });
+    }
+    if (frost) {
+      const ft = plantsWith("frostTender");
+      if (ft.length) out.push({ id: "frost-" + frost.d, pids: ft, d: frost.d, title: `Tapá las plantas sensibles ${nightOf(frost.d)}`,
+        text: `Se esperan ${frost.lo} °C. Cubrilas con tela antiheladas antes de que baje el sol.` });
+    }
+    return out;
+  }
+
+  function renderSpace(kind) {
+    const space = currentSpace(kind);
+    const title = kind === "garden" ? "Jardín" : "Cosecha";
+    if (!space) {
+      view.innerHTML = `<header class="topbar"><h1>${title}</h1></header><div class="panel glass" style="padding:20px"><p class="muted">Todavía no tenés espacios.</p><button class="btn primary" data-act="space-new" data-kind="${kind}" style="margin-top:12px">${icon("plus")} Crear un espacio</button></div>`;
+      return;
+    }
+    view.innerHTML = `
+      <header class="topbar">
+        <div class="title-row">
+          <h1>${title}</h1>
+          <button class="chip-btn glass" data-act="spaces" data-kind="${kind}" aria-haspopup="dialog"><span>${esc(space.name)}</span>${icon("chev", "sm")}</button>
+        </div>
+      </header>
+      <div class="dims mono" id="dims"></div>
+      <div class="sandbox-row">
+        <div class="stage" id="stage"></div>
+        <div class="tools glass" role="toolbar" aria-label="Herramientas del plano">
+          <button class="tool primary" data-act="add" aria-label="Agregar una planta">${icon("plus")}</button>
+          <button class="tool" data-act="sun" aria-label="Sol y sombras" aria-pressed="${state.showShadows}" id="sun-btn">${icon("sun")}</button>
+          <button class="tool" data-act="toggle-issues" aria-pressed="${state.showIssues}" aria-label="Mostrar los problemas de las plantas" id="issues-btn">${icon("eye")}</button>
+          <button class="tool" data-act="undo" aria-label="Deshacer el último cambio" id="undo-btn">${icon("undo")}</button>
+        </div>
+      </div>
+      <div class="legend" aria-label="Referencias del plano">
+        <span>${potGlyph()}En maceta</span>
+        <span><i class="lg-issue">!</i>Necesita atención, tocala</span>
+        <span><i class="lg-good"></i>Buena pareja</span>
+        <span><i class="lg-sel"></i>Seleccionada</span>
+      </div>
+      <div id="space-info"></div>
+      ${kind === "harvest" ? `<section class="section" aria-labelledby="tl-h"><div class="section-head"><h2 id="tl-h">Calendario de cosecha</h2></div><div class="panel glass tl" id="timeline"></div></section>` : ""}`;
+    drawSpace(kind);
+    if (pendingSearch && kind === "harvest") {
+      const q = pendingSearch; pendingSearch = null;
+      openCatalog(space);
+      const inp = $("#cat-search"); inp.value = q; inp.dispatchEvent(new Event("input"));
+    }
+  }
+
+  function drawSpace(kind, o = {}) {
+    if (route() !== kind) return;
+    const space = currentSpace(kind);
+    drawSandbox(space);
+    const issues = computeIssues(space);
+    const n = problemCount(issues);
+    const fs = freeSoil(space);
+    const t = tasks().find((x) => x.space === space.id && !x.done);
+    const dims = $("#dims");
+    if (dims) {
+      const wa = waterAvg(space), ph = soilPH();
+      dims.innerHTML = `<span>${fmtM(space.w)} × ${fmtM(space.l)} m</span><span>${fmt1(space.w * space.l / 1e4)} m²</span>${space.depth ? `<span>${space.depth} cm de profundidad</span>` : ""}<span>cuadrícula de ${space.cell} cm</span>${wa != null ? `<span>Agua ${fmt1(wa)}/10</span>` : ""}${ph ? `<span>pH probable ${dec(ph)} · ejemplo</span>` : ""}<span>Riego: ${irrigationOf(space) === "goteo" ? "goteo" : "manguera"}</span>`;
+    }
+    const info = $("#space-info");
+    info.innerHTML = `
+      <div class="stats glass">
+        <div class="stat"><span class="label">Suelo libre</span><span class="value num">${fs.pct}%</span><span class="sub num">${fmt1(fs.m2)} m² libres</span></div>
+        <div class="stat water"><span class="label">${icon("drop", "sm")} Humedad</span><span class="value" aria-label="Sin datos">– – –</span><span class="sub">Conectá un sensor</span></div>
+        <button class="stat" data-act="issues"><span class="label">${icon("alert", "sm")} Problemas</span><span class="value num" style="color:${n ? "var(--warn)" : "var(--good)"}">${n}</span><span class="sub">${n ? "Tocá para revisar" : "Vecinos perfectos"}</span></button>
+      </div>
+      ${t ? `<div class="reminder glass" style="margin-top:10px"><span class="bell">${icon("bell", "sm")}</span><p><b>${esc(t.title)}</b><br><span class="muted">${esc(t.meta)}</span></p></div>` : ""}`;
+    const ib = $("#issues-btn");
+    if (ib) { ib.setAttribute("aria-pressed", state.showIssues); ib.innerHTML = icon("eye") + (n && !state.showIssues ? `<span class="badge">${n}</span>` : ""); }
+    const sb = $("#sun-btn"); if (sb) sb.setAttribute("aria-pressed", state.showShadows);
+    const ub = $("#undo-btn"); if (ub) ub.disabled = !(history[space.id] && history[space.id].length);
+    const tl = $("#timeline");
+    if (tl) {
+      const rows = harvestRows().filter((r) => r.sp.id === space.id);
+      tl.innerHTML = rows.length ? rows.map((r) => `
+        <div class="row">${emo(r.p.pid, "sm")}
+          <div class="grow"><div style="display:flex;justify-content:space-between;gap:8px"><h3>${r.c.name}</h3><span class="mono ${r.left <= 0 ? "" : "faint"}" style="${r.left <= 0 ? "color:var(--soil);font-weight:500" : ""}">${r.left <= 0 ? `List${gx(r.p.pid)}` : `${r.left} días`}</span></div>
+          <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(r.pct * 100)}" aria-label="Crecimiento de ${the(r.p.pid)}"><i class="${r.left <= 0 ? "ready" : ""}" style="width:${Math.round(r.pct * 100)}%"></i></div>
+          <p class="mono faint" style="margin-top:4px">Día ${r.age} de ${r.c.days[0]}–${r.c.days[1]}</p></div></div>`).join("")
+        : `<p class="muted" style="padding:12px">Agregá cultivos con fecha de siembra para ver cuándo están listos.</p>`;
+    }
+    if (!o.keepSheet && selected) refreshPlantIssues(space);
+  }
+
+  /* ---------- Profile ---------- */
+  const LEVELS = [[0, "Plantín"], [60, "Brote"], [140, "Cultivador"], [240, "Jardinero"], [380, "Paisajista"], [600, "Maestro jardinero"]];
+  function discovered() {
+    const ids = new Set(); state.spaces.forEach((s) => s.plants.forEach((p) => ids.add(p.pid)));
+    return [...ids];
+  }
+  function score(ids) {
+    const fams = new Set(ids.map((i) => CATALOG[i].family));
+    return ids.reduce((a, i) => a + CATALOG[i].rarity * 10, 0) + fams.size * 5;
+  }
+  function renderProfile() {
+    const ids = discovered();
+    const pts = score(ids);
+    let li = 0; LEVELS.forEach((l, i) => { if (pts >= l[0]) li = i; });
+    const next = LEVELS[li + 1];
+    const pct = next ? (pts - LEVELS[li][0]) / (next[0] - LEVELS[li][0]) : 1;
+    const perfect = state.spaces.filter((s) => s.plants.length >= 3 && problemCount(computeIssues(s)) === 0).length;
+    const pollMax = Math.max(0, ...state.spaces.map((s) => new Set(s.plants.filter((p) => CATALOG[p.pid].pollinator).map((p) => p.pid)).size));
+    const photosTaken = Object.values(state.sunStudy).reduce((a, s) => a + Object.keys(s || {}).length, 0);
+    const precTaken = Object.values(state.precDone).filter(Boolean).length;
+    const ROMAN = ["", "I", "II", "III"];
+    const chains = [
+      { ic: "leaf", name: "Coleccionista", unit: "especies plantadas", v: ids.length, tiers: [5, 15, 30], reward: "10% de descuento en un sensor de suelo" },
+      { ic: "flame", name: "Constancia", unit: "semanas seguidas", v: 6, tiers: [4, 12, 26], reward: "1 mes de Saphi Plus" },
+      { ic: "shield", name: "Buenos vecinos", unit: "espacios sin problemas", v: perfect, tiers: [1, 3, 5], plus: true },
+      { ic: "flower", name: "Amigo de los polinizadores", unit: "especies polinizadoras en un espacio", v: pollMax, tiers: [3, 5, 8] },
+      { ic: "sun", name: "Lector de sol", unit: "fotos del estudio de sol", v: photosTaken, tiers: [1, 3, 9], plus: true },
+      { ic: "cloud", name: "Previsor del clima", unit: "precauciones de clima tomadas", v: precTaken, tiers: [1, 10, 25], plus: true },
+      { ic: "basket", name: "Cosechador", unit: "cosechas registradas", v: 0, tiers: [1, 10, 50], reward: "20% de descuento en el kit de riego" },
+    ].map((c) => ({ ...c, tier: c.tiers.filter((t) => c.v >= t).length }));
+    const earned = chains.reduce((a, c) => a + c.tier, 0);
+    const all = Object.keys(CATALOG);
+    const rar = (r) => r >= 8 ? `<span class="pill crit">Rara</span>` : r >= 3 ? `<span class="pill warn">Poco común</span>` : `<span class="pill plain">Común</span>`;
+    view.innerHTML = `
+      <header class="me">
+        <div class="avatar">${icon("sprout")}</div>
+        <div style="flex:1;min-width:0">
+          <h1>${LEVELS[li][1]}</h1>
+          <p class="muted">Nivel ${li + 1}${next ? ` · te faltan ${next[0] - pts} puntos para ${next[1]}` : ""}</p>
+          <div class="level bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct * 100)}" aria-label="Progreso de nivel"><i style="width:${Math.round(pct * 100)}%"></i></div>
+        </div>
+      </header>
+
+      <div class="trio glass">
+        <div><b class="num">${ids.length}</b><span>Especies</span></div>
+        <div><b class="num">${pts}</b><span>Biodiversidad</span></div>
+        <div><b class="num">6</b><span>Semanas seguidas</span></div>
+      </div>
+
+      <section class="plus glass" aria-labelledby="plus-h">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h2 id="plus-h">Saphi Plus</h2><span class="pill good">Gratis durante la beta</span></div>
+        <p class="muted" style="font-size:14px">Espacios ilimitados, análisis del estudio de sol y alertas de clima. Los logros Plus te descuentan 20% del mes siguiente, de forma automática.</p>
+        <div class="row" style="padding:10px 0 0;border-top:1px solid var(--line);border-radius:0">
+          <div class="grow"><h3>Próximo mes, después de la beta</h3><p>${(() => { const e = chains.find((c) => c.plus && c.tier); return e ? `Ganaste ${e.name} ${ROMAN[e.tier]} este mes` : "Ganá un logro Plus para tener 20% de descuento"; })()}</p></div>
+          <div class="price">${chains.some((c) => c.plus && c.tier) ? `<s>US$5</s><b class="num">US$4</b>` : `<b class="num">US$5</b>`}</div>
+        </div>
+        <span class="example">Precio de ejemplo</span>
+      </section>
+
+      <section class="section" aria-labelledby="ach-h">
+        <div class="section-head"><h2 id="ach-h">Logros</h2><span class="faint num">${earned}/${chains.length * 3} niveles</span></div>
+        <div class="panel glass">
+          ${chains.map((c) => {
+            const next = c.tiers[c.tier];
+            const prev = c.tier ? c.tiers[c.tier - 1] : 0;
+            const pct = next ? clamp((c.v - prev) / (next - prev), 0, 1) : 1;
+            return `<div class="row ach ${c.tier ? "" : "locked"}">
+              <span class="medal tier">${icon(c.tier ? c.ic : "lock")}${c.tier ? `<span class="num-badge">${ROMAN[c.tier]}</span>` : ""}</span>
+              <div class="grow">
+                <div style="display:flex;justify-content:space-between;gap:8px"><h3 style="display:flex;gap:6px;align-items:center">${c.name}${c.tier ? ` ${ROMAN[c.tier]}` : ""}${c.plus ? `<span class="pill plusp">Plus</span>` : ""}</h3><span class="mono faint num">${next ? `${c.v}/${next}` : "Listo"}</span></div>
+                <p>${next ? `Te faltan ${next - c.v} ${c.unit} para el nivel ${ROMAN[c.tier + 1]}` : `Todos los niveles completos · ${c.v} ${c.unit}`}</p>
+                <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct * 100)}" aria-label="Progreso de ${c.name}"><i style="width:${Math.round(pct * 100)}%"></i></div>
+                ${c.plus ? `<span class="reward">${icon("basket", "sm")}Cada nivel nuevo: 20% de descuento en tu próximo mes de Plus</span>` : c.reward ? `<span class="reward">${icon("basket", "sm")}Premio del nivel III: ${c.reward}</span>` : ""}
+              </div>
+            </div>`;
+          }).join("")}
+        </div>
+        <p class="faint" style="font-size:12px">Los premios están pensados para después de la beta y acá se muestran como ejemplo.</p>
+      </section>
+
+      <section class="section" aria-labelledby="herb-h">
+        <div class="section-head"><h2 id="herb-h">Colección de plantas</h2><span class="faint num">${ids.length}/${all.length}</span></div>
+        <p class="muted" style="font-size:14px">Cada especie que plantás se suma a tu colección. Las especies raras suman más puntos de biodiversidad.</p>
+        <div class="herb">
+          ${all.sort((a, b) => (ids.includes(b) - ids.includes(a)) || CATALOG[b].rarity - CATALOG[a].rarity).map((pid) => {
+            const c = CATALOG[pid], has = ids.includes(pid);
+            return `<button class="glass ${has ? "" : "undisc"}" data-act="herb" data-pid="${pid}" style="--c:${c.color}">
+<span class="leafmark">${icon(has ? (c.kind === "harvest" ? "sprout" : "leaf") : "lock")}</span>
+              <div><h3>${has ? c.name : "Sin descubrir"}</h3><p class="sci">${has ? c.sci : c.family}</p></div>
+              <div class="facts" style="gap:4px">${has ? rar(c.rarity) : `<span class="pill plain">${c.rarity * 10} pts</span>`}${c.native ? `<span class="pill good">Nativa</span>` : ""}</div>
+            </button>`;
+          }).join("")}
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="set-h">
+        <div class="section-head"><h2 id="set-h">Ajustes</h2></div>
+        <div class="panel glass">
+          <div class="setting">
+            <div class="between"><h3>Tema</h3><span class="faint" style="font-size:13px">${state.mode === "auto" ? `Ahora ${resolvedMode() === "day" ? "de día" : "de noche"}, según tu hora local` : ""}</span></div>
+            <div class="seg glass" role="group" aria-label="Tema">
+              ${[["auto", "Automático", "auto"], ["day", "Día", "sun"], ["night", "Noche", "moon"]].map(([v, l, ic]) => `<button data-act="mode" data-mode="${v}" aria-pressed="${state.mode === v}">${icon(ic, "sm")}${l}</button>`).join("")}
+            </div>
+          </div>
+          <div class="setting">
+            <div class="between"><h3>Ubicación</h3><span class="faint" style="font-size:13px">Para el sol, la sombra y el clima</span></div>
+            <p class="muted" style="font-size:14px">${locSummary()}</p>
+            ${locationHTML()}
+          </div>
+          <div class="setting">
+            <div class="between"><h3>Hemisferio</h3><span class="faint" style="font-size:13px">${state.location ? "Lo define tu ubicación" : "Si preferís no compartir tu ubicación"}</span></div>
+            <div class="seg glass" role="group" aria-label="Hemisferio" style="grid-template-columns:1fr 1fr">
+              ${[["south", "Sur"], ["north", "Norte"]].map(([v, l]) => `<button data-act="hemi" data-v="${v}" aria-pressed="${hemi() === v}" ${state.location ? "disabled" : ""}>${l}</button>`).join("")}
+            </div>
+          </div>
+          <div class="setting"><div class="between"><h3>Unidades</h3><span class="muted">Métrico (cm, m)</span></div></div>
+          <div class="setting"><div class="between"><h3>Cómo funciona Saphi</h3><button class="btn" data-act="tour-open">Ver el tutorial</button></div></div>
+          <div class="setting"><div class="between"><h3>Tus datos</h3><span class="muted" style="font-size:13px;text-align:right">En el prototipo quedan en este dispositivo</span></div>
+            <button class="btn danger" data-act="reset" style="align-self:flex-start">Restablecer datos de ejemplo</button></div>
+        </div>
+      </section>`;
+  }
+
+  /* ---------- Sheet ---------- */
+  const sheet = $("#sheet"), sheetBody = $("#sheet-body"), scrim = $("#scrim");
+  let onSheetClose = null, lastFocus = null;
+  function openSheet(html, onClose) {
+    sheetKind = null;
+    if (!sheet.classList.contains("open")) lastFocus = document.activeElement;
+    sheetBody.innerHTML = html;
+    scrim.hidden = false; requestAnimationFrame(() => scrim.classList.add("show"));
+    sheet.classList.add("open"); sheet.setAttribute("aria-hidden", "false");
+    onSheetClose = onClose || null;
+    sheetBody.scrollTop = 0;
+    setTimeout(() => { const f = sheetBody.querySelector("[autofocus], input, button"); if (f) f.focus({ preventScroll: true }); }, 60);
+  }
+  function closeSheet(silent) {
+    if (!sheet.classList.contains("open")) return;
+    sheet.classList.remove("open"); sheet.setAttribute("aria-hidden", "true");
+    scrim.classList.remove("show"); setTimeout(() => { if (!sheet.classList.contains("open")) scrim.hidden = true; }, 300);
+    const cb = onSheetClose; onSheetClose = null;
+    if (cb && !silent) cb();
+    if (lastFocus && document.contains(lastFocus) && !silent) lastFocus.focus({ preventScroll: true });
+  }
+  scrim.addEventListener("click", () => closeSheet());
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSheet(); });
+
+  const SUN = { full: "Sol pleno", partial: "Media sombra", shade: "Sombra" };
+  // Plant facts shared by the plant sheet and the collection sheet
+  const factsHTML = (c) => `<span class="fact">${icon("sun", "sm")}${SUN[c.sun]}</span><span class="fact">${icon("drop", "sm")}Agua ${c.water}/10</span><span class="fact mono">pH ${dec(c.ph[0])}–${dec(c.ph[1])}</span><span class="fact">${c.life}</span>${c.native ? `<span class="fact" style="color:var(--good);background:var(--good-bg)">Nativa</span>` : ""}${c.invasive ? `<span class="fact" style="color:var(--crit)">Se expande</span>` : ""}${c.invasiveAR ? `<span class="fact" style="color:var(--crit);background:var(--crit-bg)">Invasora en Argentina</span>` : ""}`;
+
+  function issueHTML(it, space, withJump) {
+    const ic = it.sev === "good" ? "sprout" : "alert";
+    const fixP = it.fix && space ? space.plants.find((p) => p.uid === it.fix) : null;
+    return `<div class="issue ${it.sev}">${icon(ic)}<div class="grow"><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><b>${it.type}</b><span class="pill plain">${it.conf}</span></div><span>${esc(it.text)}</span><div class="actions" style="gap:14px">${fixP ? `<button class="link" data-act="pot-on" data-uid="${it.fix}" style="display:inline-flex;align-items:center;gap:6px">${potGlyph()}Poner ${esc(the(fixP.pid))} en maceta</button>` : ""}${withJump ? `<button class="link" data-act="jump" data-uid="${it.a}">Ver en el plano</button>` : ""}</div></div></div>`;
+  }
+
+  const potGlyph = () => `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" style="flex:none"><circle cx="8" cy="8.6" r="6.3" fill="#000" fill-opacity=".16"/><circle cx="8" cy="8" r="5.6" fill="var(--pot-soil)" stroke="var(--pot)" stroke-width="2"/></svg>`;
+  const defaultPot = (p) => clamp(Math.round((Math.min(p.sx, p.sy) * 0.6) / 5) * 5, 20, 80);
+  function setPot(space, uid, on) {
+    const p = space.plants.find((q) => q.uid === uid); if (!p) return;
+    if (!!p.pot === on) return;
+    pushHistory(space);
+    if (on) p.pot = defaultPot(p); else delete p.pot;
+    save(); drawSpace(space.kind, { keepSheet: true });
+    toast(on ? `${The(p.pid)} pasó a una maceta de ${p.pot} cm` : `${The(p.pid)} volvió a la tierra`);
+  }
+
+  function openPlant(space, uid) {
+    selected = uid;
+    drawSpace(space.kind, { keepSheet: true });
+    const p = space.plants.find((q) => q.uid === uid); if (!p) return;
+    const c = CATALOG[p.pid];
+    const sl = (key, label, min, max) => `<div class="slider"><label for="sl-${key}">${label}</label><input type="range" id="sl-${key}" min="${min}" max="${max}" step="5" value="${p[key]}" data-key="${key}"><output class="mono num" id="out-${key}">${p[key]} cm</output></div>`;
+    openSheet(`
+      <div class="sh-head">${c.kind === "harvest" ? emo(p.pid) : `<span class="swatch" style="--c:${c.color}"></span>`}<div class="grow"><h2>${c.name}${p.count ? ` <span class="faint mono">×${p.count}</span>` : ""}</h2><p class="sci">${c.sci}</p></div><button class="icon-btn" data-act="close" aria-label="Cerrar">${icon("x")}</button></div>
+      <div class="facts">${factsHTML(c)}</div>
+      <div class="section"><div class="section-head" style="margin:0"><h3>Tamaño adulto</h3><span class="faint" style="font-size:12px">Catálogo: ${c.sx} × ${c.sy} × ${c.h} cm</span></div>
+        ${sl("sx", "Ancho", 10, Math.max(400, c.sx * 2))}${sl("sy", "Largo", 10, Math.max(400, c.sy * 2))}${sl("h", "Alto", 10, Math.max(500, c.h * 2))}
+      </div>
+      <div class="section">
+        <h3>Dónde está plantada</h3>
+        <div class="seg glass" role="group" aria-label="Dónde está plantada" style="grid-template-columns:1fr 1fr">
+          <button data-act="pot-mode" data-v="ground" aria-pressed="${!p.pot}">En la tierra</button>
+          <button data-act="pot-mode" data-v="pot" aria-pressed="${!!p.pot}">${potGlyph()}En maceta</button>
+        </div>
+        ${p.pot ? `${sl("pot", "Maceta Ø", 15, 120)}<p class="muted" style="font-size:13px">La maceta separa raíces y tierra: no se escapan estolones y tiene su propio pH. ${p.pot < Math.min(p.sx, p.sy) * 0.4 ? `<b style="color:var(--warn)">Esta maceta parece chica para una planta de ${p.sx} cm.</b>` : ""}</p>` : ""}
+      </div>
+      <div class="section"><h3>Vecinos y suelo</h3><div class="issues" id="plant-issues"></div></div>
+      <div class="actions">
+        <button class="btn" data-act="dup">${icon("copy", "sm")}Duplicar</button>
+        <button class="btn danger" data-act="remove">${icon("trash", "sm")}Quitar</button>
+        <button class="btn primary" data-act="close">Listo</button>
+      </div>`, () => { selected = null; drawSpace(space.kind, { keepSheet: true }); });
+    refreshPlantIssues(space);
+    sheetBody.querySelectorAll("input[type=range]").forEach((inp) => {
+      let pushed = false;
+      inp.addEventListener("input", () => {
+        if (!pushed) { pushHistory(space); pushed = true; }
+        const v = +inp.value; p[inp.dataset.key] = v;
+        if (inp.dataset.key !== "h") { p.x = clamp(p.x, Math.min(p.sx / 2, space.w / 2), Math.max(space.w - p.sx / 2, space.w / 2)); p.y = clamp(p.y, Math.min(p.sy / 2, space.l / 2), Math.max(space.l - p.sy / 2, space.l / 2)); }
+        $("#out-" + inp.dataset.key).textContent = v + " cm";
+        drawSpace(space.kind, { keepSheet: true }); refreshPlantIssues(space);
+      });
+      inp.addEventListener("change", () => { pushed = false; save(); });
+    });
+  }
+  function refreshPlantIssues(space) {
+    const box = $("#plant-issues"); if (!box || !selected) return;
+    const mine = computeIssues(space).filter((i) => i.a === selected || i.b === selected);
+    box.innerHTML = mine.length ? mine.map((i) => issueHTML(i, space)).join("") : `<div class="issue good">${icon("check")}<div class="grow"><b>Sin conflictos</b><span>Esta planta tiene lugar, luz y tierra compatible a su alrededor.</span></div></div>`;
+  }
+
+  function openCatalog(space) {
+    const list = (q) => Object.entries(CATALOG)
+      .filter(([, c]) => c.kind === space.kind && (!q || (c.name + " " + c.sci).toLowerCase().includes(q.toLowerCase())))
+      .map(([id, c]) => `<button class="row cat-row" data-act="place" data-pid="${id}"><span class="swatch" style="--c:${c.color}"></span><div class="grow"><h3>${c.name}${c.native ? ` <span class="pill good">Nativa</span>` : ""}${c.invasiveAR ? ` <span class="pill crit">Invasora</span>` : ""}</h3><p class="mono">Ø ${c.sx === c.sy ? c.sx : `${c.sx}×${c.sy}`} cm · ${c.h} cm de alto</p></div><span class="fact" style="height:26px">${icon(c.sun === "full" ? "sun" : "leaf", "sm")}${c.sun === "full" ? "Sol" : "Sombra"}</span></button>`).join("")
+      || `<p class="muted" style="padding:12px">Ninguna planta coincide. Probá con el nombre común o el científico.</p>`;
+    openSheet(`
+      <div class="sh-head"><div class="grow"><h2>Agregar una planta</h2><p class="muted">En ${esc(space.name)}. Los tamaños son de planta adulta.</p></div><button class="icon-btn" data-act="close" aria-label="Cerrar">${icon("x")}</button></div>
+      <label class="search">${icon("search", "sm")}<input id="cat-search" type="search" placeholder="Buscá ${space.kind === "garden" ? "ornamentales" : "cultivos"}" aria-label="Buscar plantas" autocomplete="off"></label>
+      <div class="panel" id="cat-list" style="padding:0">${list("")}</div>`);
+    $("#cat-search").addEventListener("input", (e) => { $("#cat-list").innerHTML = list(e.target.value.trim()); });
+  }
+
+  function openIssues(space) {
+    const iss = computeIssues(space);
+    const probs = iss.filter((i) => i.sev !== "good"), goods = iss.filter((i) => i.sev === "good");
+    openSheet(`
+      <div class="sh-head"><div class="grow"><h2>${probs.length ? `${probs.length} ${probs.length === 1 ? "problema" : "problemas"} en ${esc(space.name)}` : "Vecinos perfectos"}</h2><p class="muted">Espacio, sombra, suelo y plantas invasoras.</p></div><button class="icon-btn" data-act="close" aria-label="Cerrar">${icon("x")}</button></div>
+      <div class="issues">${probs.sort((a, b) => (a.sev === "crit" ? 0 : 1) - (b.sev === "crit" ? 0 : 1)).map((i) => issueHTML(i, space, true)).join("") || `<div class="issue good">${icon("check")}<div class="grow"><b>Nada para arreglar</b><span>Cada planta tiene lugar, luz y tierra compatible.</span></div></div>`}</div>
+      ${goods.length ? `<div class="section"><h3>Buenas parejas</h3><div class="issues">${goods.map((i) => issueHTML(i, space, false)).join("")}</div></div>` : ""}
+      <p class="faint" style="font-size:12px" data-kind="issues">Medido: calculado con el tamaño de las plantas. Documentado: respaldado por fuentes de horticultura. Tradicional: consejo común de jardinería, con menos evidencia. Estimado: calculado con la altura de la planta y la dirección del sol, o con datos de suelo de ejemplo.</p>`);
+    sheetKind = { type: "issues" };
+  }
+
+  function locationHTML() {
+    const loc = state.location;
+    return `<div class="field"><label for="loc-city">Ciudad</label>
+        <select class="input" id="loc-city"><option value="">${loc ? "Cambiar ciudad" : "Elegí una ciudad"}</option>${CITIES.map(([n]) => `<option value="${esc(n)}" ${loc && loc.name === n ? "selected" : ""}>${esc(n)}</option>`).join("")}</select></div>
+      <div class="actions"><button class="btn" data-act="loc-gps">${icon("sun", "sm")}Usar mi ubicación actual</button>${loc ? `<button class="btn" data-act="loc-clear">Quitar ubicación</button>` : ""}</div>`;
+  }
+  const locSummary = () => {
+    const lat = latitude();
+    return state.location
+      ? `${esc(state.location.name)} · ${fmt1(Math.abs(lat))}° ${lat < 0 ? "S" : "N"}`
+      : `Sin ubicación. Usamos el Hemisferio ${hemi() === "south" ? "Sur" : "Norte"} a ${fmt1(Math.abs(lat))}°.`;
+  };
+
+  let sheetKind = null;
+  function openSun(space) {
+    const study = (state.sunStudy[space.id] = state.sunStudy[space.id] || {});
+    const ph = photos[space.id] || {};
+    const SLOTS = [["s8", "08:00", "Mañana"], ["s13", "13:00", "Mediodía"], ["s19", "19:00", "Tarde"]];
+    const taken = SLOTS.filter(([k]) => study[k]).length;
+    const soil = soilPH();
+    openSheet(`
+      <div class="sh-head"><div class="grow"><h2>Sol y sombras</h2><p class="muted">${esc(space.name)}</p></div><button class="icon-btn" data-act="close" aria-label="Cerrar">${icon("x")}</button></div>
+      <div class="panel glass">
+        <div class="row"><div class="grow"><h3>Ubicación</h3><p>${locSummary()}</p></div></div>
+        ${soil ? `<div class="row"><div class="grow"><h3>Suelo</h3><p class="mono">pH probable ${dec(soil)} · ejemplo</p></div></div>` : ""}
+        <div class="row"><div class="grow"><h3>Sol del mediodía ${seasonLabel()}</h3><p class="mono">${Math.round(noonElevation())}° sobre el horizonte · una planta de 1 m da ${shadowLen(100)} cm de sombra</p></div></div>
+      </div>
+      ${state.location ? "" : `<div class="section">${locationHTML()}</div>`}
+      <div class="seg glass" role="group" aria-label="Estación">
+        ${[["today", "Hoy"], ["winter", "Pleno invierno"], ["summer", "Pleno verano"]].map(([v, l]) => `<button data-act="season" data-v="${v}" aria-pressed="${state.season === v}">${l}</button>`).join("")}
+      </div>
+      <div class="between" style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+        <div><h3>Mostrar sombras del mediodía</h3><p class="muted" style="font-size:13px">Los avisos de sombra usan la misma estación.</p></div>
+        <button class="switch" role="switch" aria-checked="${state.showShadows}" data-act="shadows" aria-label="Mostrar sombras del mediodía"></button>
+      </div>
+      <div class="section">
+        <div class="section-head" style="margin:0"><h3>Estudio de sol</h3><span class="faint num">${taken}/3 fotos</span></div>
+        <p class="muted" style="font-size:14px">Sacá una foto del espacio desde el mismo lugar a estas horas. Saphi marca dónde caen la luz y la sombra en tu cuadrícula. Con una foto a las 13:00 alcanza para empezar.</p>
+        <div class="slots">
+          ${SLOTS.map(([k, t, l]) => `<label class="slot ${study[k] ? "done" : ""}">
+            ${ph[k] ? `<img src="${ph[k]}" alt="Foto de las ${t}">` : study[k] ? "" : icon("plus")}
+            <span class="t">${t}</span>${study[k] ? "" : `<span style="font-size:12px">${l}</span>`}
+            <input type="file" accept="image/*" capture="environment" data-slot="${k}" aria-label="Agregar foto de las ${t}">
+          </label>`).join("")}
+        </div>
+        <p class="faint" style="font-size:12px">En este prototipo las fotos quedan en tu dispositivo y no se analizan.</p>
+      </div>`);
+    sheetKind = { type: "sun", space };
+    sheetBody.querySelectorAll(".slot input").forEach((inp) => inp.addEventListener("change", () => {
+      const f = inp.files && inp.files[0]; if (!f) return;
+      (photos[space.id] = photos[space.id] || {})[inp.dataset.slot] = URL.createObjectURL(f);
+      study[inp.dataset.slot] = Date.now(); save();
+      openSun(space); toast("Foto agregada al estudio de sol");
+    }));
+  }
+
+  function setLocation(loc) {
+    state.location = loc; save();
+    if (sheetKind && sheetKind.type === "sun" && sheet.classList.contains("open")) { openSun(sheetKind.space); drawSpace(sheetKind.space.kind, { keepSheet: true }); }
+    else render();
+    toast(loc ? `Ubicación: ${loc.name}` : "Quitaste la ubicación");
+  }
+  document.addEventListener("change", (e) => {
+    if (e.target.id !== "loc-city" || !e.target.value) return;
+    const c = CITIES.find(([n]) => n === e.target.value);
+    if (c) setLocation({ name: c[0], lat: c[1] });
+  });
+
+  function openSpaces(kind, showForm) {
+    const list = state.spaces.filter((s) => s.kind === kind);
+    const cur = currentSpace(kind);
+    openSheet(`
+      <div class="sh-head"><div class="grow"><h2>${kind === "garden" ? "Espacios de jardín" : "Espacios de cosecha"}</h2></div><button class="icon-btn" data-act="close" aria-label="Cerrar">${icon("x")}</button></div>
+      <div class="panel glass" role="radiogroup" aria-label="Espacios">
+        ${list.map((s) => `<button class="row radio-row" role="radio" aria-checked="${cur && s.id === cur.id}" data-act="pick-space" data-id="${s.id}"><span class="radio-dot"></span><div class="grow"><h3>${esc(s.name)}</h3><p class="mono">${fmtM(s.w)} × ${fmtM(s.l)} m · ${s.plants.length} ${s.plants.length === 1 ? "planta" : "plantas"}</p></div></button>`).join("")}
+      </div>
+      ${cur && !showForm ? `<div class="section">
+        <div class="between" style="display:flex;justify-content:space-between;align-items:baseline;gap:12px"><h3>Riego</h3><span class="faint" style="font-size:13px">${esc(cur.name)}</span></div>
+        <div class="seg glass" role="group" aria-label="Riego de ${esc(cur.name)}" style="grid-template-columns:1fr 1fr">
+          ${[["manguera", "Manguera"], ["goteo", "Goteo"]].map(([v, l]) => `<button data-act="irrigation" data-v="${v}" aria-pressed="${irrigationOf(cur) === v}">${icon("drop", "sm")}${l}</button>`).join("")}
+        </div>
+      </div>` : ""}
+      <form class="section" id="space-form" novalidate ${showForm ? "" : "hidden"}>
+        <h3>Espacio nuevo</h3>
+        <div class="form">
+          <div class="field full"><label for="f-name">Nombre</label><input id="f-name" maxlength="40" placeholder="Cantero del fondo" required></div>
+          <div class="field"><label for="f-w">Ancho (m)</label><input id="f-w" inputmode="decimal" placeholder="3,5"></div>
+          <div class="field"><label for="f-l">Largo (m)</label><input id="f-l" inputmode="decimal" placeholder="6"></div>
+          <div class="field full"><label for="f-d">Profundidad de tierra (cm, opcional)</label><input id="f-d" inputmode="numeric" placeholder="40"><span class="hint">Sirve para canteros elevados y macetas.</span></div>
+        </div>
+        <p class="err" id="f-err" role="alert"></p>
+        <button class="btn primary" type="submit">Crear espacio</button>
+      </form>
+      ${showForm ? "" : `<button class="btn" data-act="space-new" data-kind="${kind}">${icon("plus", "sm")}Espacio nuevo</button>`}`);
+    const form = $("#space-form");
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = $("#f-name").value.trim();
+      const num = (v) => parseFloat(String(v).replace(",", "."));
+      const w = num($("#f-w").value), l = num($("#f-l").value), dRaw = $("#f-d").value.trim(), d = dRaw ? num(dRaw) : null;
+      const err = $("#f-err");
+      if (!name) { err.textContent = "Ponele un nombre al espacio, como “Frente de casa”."; $("#f-name").focus(); return; }
+      if (!(w >= 0.3 && w <= 100) || !(l >= 0.3 && l <= 100)) { err.textContent = "El ancho y el largo tienen que estar entre 0,3 y 100 metros."; return; }
+      if (dRaw && !(d > 0 && d <= 300)) { err.textContent = "La profundidad tiene que estar entre 1 y 300 cm, o quedar vacía."; return; }
+      const W = Math.round(w * 100), L = Math.round(l * 100);
+      const cell = W * L > 400000 ? 25 : 10;
+      const sp = { id: "s" + Date.now().toString(36), kind, name, w: W, l: L, depth: d ? Math.round(d) : null, cell, irrigation: "manguera", plants: [] };
+      state.spaces.push(sp); state.current[kind] = sp.id; save();
+      closeSheet(true); renderSpace(kind); toast(`Creaste “${name}”. Agregá tu primera planta.`);
+    });
+  }
+
+  /* ---------- Toast ---------- */
+  let toastT;
+  function toast(msg, action) {
+    const el = $("#toast"), btn = $("#toast-act");
+    $("#toast-msg").textContent = msg;
+    btn.hidden = !action; btn.onclick = action ? () => { action(); el.classList.remove("show"); } : null;
+    el.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove("show"), action ? 4500 : 2400);
+  }
+
+  /* ---------- Actions ---------- */
+  document.addEventListener("click", (e) => {
+    const link = e.target.closest("a[data-space]");
+    if (link) { const sp = spaceById(link.dataset.space); if (sp) { state.current[sp.kind] = sp.id; save(); } }
+    const b = e.target.closest("[data-act]"); if (!b) return;
+    const act = b.dataset.act;
+    const r = route();
+    const space = (r === "garden" || r === "harvest") ? currentSpace(r) : null;
+    switch (act) {
+      case "close": closeSheet(); break;
+      case "add": openCatalog(space); break;
+      case "place": {
+        const c = CATALOG[b.dataset.pid];
+        const spot = findFreeSpot(space, c.sx, c.sy);
+        pushHistory(space);
+        const p = P(b.dataset.pid, spot.x, spot.y, 0);
+        space.plants.push(p); save();
+        closeSheet(true); openPlant(space, p.uid);
+        toast(spot.ok ? `Agregaste ${the(p.pid)}. Arrastral${gx(p.pid)} para mover${gx(p.pid) === "o" ? "lo" : "la"}.` : `No hay un lugar libre para ${the(p.pid)}. Quedó en el centro.`);
+        break;
+      }
+      case "sun": openSun(space); break;
+      case "day": openDay(+b.dataset.d); break;
+      case "sow": pendingSearch = b.dataset.name; state.current.harvest = state.current.harvest || "bed"; save();
+        if (route() === "harvest") { render(); } else location.hash = "harvest"; break;
+      case "tour-next": tourStep++; drawTour(); break;
+      case "tour-back": tourStep = Math.max(0, tourStep - 1); drawTour(); break;
+      case "tour-end": endTour(); break;
+      case "tour-open": tourStep = 0; drawTour(); break;
+      case "pot-mode": setPot(space, selected, b.dataset.v === "pot"); openPlant(space, selected); break;
+      case "pot-on": {
+        const kind = sheetKind && sheetKind.type;
+        setPot(space, b.dataset.uid, true);
+        if (kind === "issues") openIssues(space); else if (selected) openPlant(space, selected);
+        break;
+      }
+      case "season": state.season = b.dataset.v; save(); drawSpace(r, { keepSheet: true }); openSun(space); break;
+      case "shadows": state.showShadows = !state.showShadows; save(); drawSpace(r, { keepSheet: true }); openSun(space); break;
+      case "loc-clear": setLocation(null); break;
+      case "loc-gps": {
+        const fail = () => toast("Acá la ubicación está bloqueada. Elegí una ciudad.");
+        try {
+          if (!navigator.geolocation) { fail(); break; }
+          navigator.geolocation.getCurrentPosition(
+            (pos) => { const { latitude: la, longitude: lo } = pos.coords; setLocation({ name: `Ubicación actual (${fmt1(la)}°; ${fmt1(lo)}°)`, lat: la }); },
+            fail, { timeout: 8000, maximumAge: 600000 });
+        } catch (err) { fail(); }
+        break;
+      }
+      case "prec": {
+        state.precDone[b.dataset.id] = !state.precDone[b.dataset.id]; save(); renderHome();
+        const again = document.querySelector(`[data-act="prec"][data-id="${b.dataset.id}"]`); if (again) again.focus({ preventScroll: true });
+        break;
+      }
+      case "toggle-issues": state.showIssues = !state.showIssues; save(); drawSpace(r, { keepSheet: true }); break;
+      case "undo": undo(space); break;
+      case "issues": openIssues(space); break;
+      case "jump": closeSheet(true); openPlant(space, b.dataset.uid); break;
+      case "dup": {
+        const p = space.plants.find((q) => q.uid === selected); if (!p) break;
+        const spot = findFreeSpot(space, p.sx, p.sy);
+        pushHistory(space);
+        const n = { ...p, uid: "p" + (++uidN) + Math.random().toString(36).slice(2, 6), x: spot.x, y: spot.y };
+        space.plants.push(n); save(); closeSheet(true); openPlant(space, n.uid); toast(`Duplicaste ${the(p.pid)}`);
+        break;
+      }
+      case "remove": {
+        const p = space.plants.find((q) => q.uid === selected); if (!p) break;
+        pushHistory(space);
+        space.plants = space.plants.filter((q) => q.uid !== p.uid); selected = null; save();
+        closeSheet(true); drawSpace(r);
+        toast(`Quitaste ${the(p.pid)}`, () => undo(space));
+        break;
+      }
+      case "spaces": openSpaces(b.dataset.kind, false); break;
+      case "irrigation": {
+        if (!space) break;
+        space.irrigation = b.dataset.v === "goteo" ? "goteo" : "manguera"; save();
+        openSpaces(r, false); drawSpace(r, { keepSheet: true });
+        toast(space.irrigation === "goteo" ? `${space.name}: riego por goteo` : `${space.name}: riego con manguera`);
+        break;
+      }
+      case "space-new": openSpaces(b.dataset.kind, true); break;
+      case "pick-space": state.current[r] = b.dataset.id; save(); closeSheet(true); renderSpace(r); break;
+      case "task": {
+        const key = today.toISOString().slice(0, 10);
+        const day = (state.tasksDone[key] = state.tasksDone[key] || {});
+        day[b.dataset.id] = !day[b.dataset.id]; save(); renderHome();
+        const again = document.querySelector(`[data-act="task"][data-id="${b.dataset.id}"]`); if (again) again.focus({ preventScroll: true });
+        break;
+      }
+      case "cycle-mode": state.mode = state.mode === "auto" ? (resolvedMode() === "day" ? "night" : "day") : "auto"; save(); applyMode(); renderHome();
+        toast(state.mode === "auto" ? "El tema sigue tu hora local" : `Tema de ${state.mode === "day" ? "día" : "noche"} activado`); break;
+      case "mode": state.mode = b.dataset.mode; save(); applyMode(); renderProfile(); break;
+      case "hemi": state.hemisphere = b.dataset.v; save(); renderProfile(); toast("Avisos de sombra actualizados"); break;
+      case "herb": {
+        const c = CATALOG[b.dataset.pid]; const ids = discovered();
+        if (!ids.includes(b.dataset.pid)) { toast(`Plantá esta especie de la familia ${c.family} para descubrirla`); break; }
+        const sp = state.spaces.filter((s) => s.plants.some((p) => p.pid === b.dataset.pid)).map((s) => s.name).join(", ");
+        openSheet(`<div class="sh-head">${c.kind === "harvest" ? emo(b.dataset.pid) : `<span class="swatch" style="--c:${c.color}"></span>`}<div class="grow"><h2>${c.name}</h2><p class="sci">${c.sci} · ${c.family}</p></div><button class="icon-btn" data-act="close" aria-label="Cerrar">${icon("x")}</button></div>
+          <div class="facts">${factsHTML(c)}</div>
+          <div class="panel glass"><div class="row"><div class="grow"><h3>Tamaño adulto</h3><p class="mono">${c.sx} × ${c.sy} cm de ancho · ${c.h} cm de alto</p></div></div><div class="row"><div class="grow"><h3>Crece en</h3><p>${esc(sp)}</p></div></div><div class="row"><div class="grow"><h3>Valor de biodiversidad</h3><p>${c.rarity * 10} puntos</p></div></div></div>`);
+        break;
+      }
+      case "reset": state = Object.assign(EXTRA(), SEED(), { tutorialDone: true }); Object.keys(history).forEach((k) => delete history[k]); save(); applyMode(); render(); toast("Datos de ejemplo restaurados"); break;
+    }
+  });
+
+  /* ---------- Tutorial ---------- */
+  let tourStep = 0;
+  const big = (id) => `<span style="width:72px;height:72px;border-radius:50%;display:grid;place-items:center;background:var(--forest);color:var(--forest-ink)"><svg class="ic" style="width:34px;height:34px"><use href="#i-${id}"/></svg></span>`;
+  const TOUR = [
+    { t: "Te damos la bienvenida a Saphi", p: "Planificá tu jardín y tu huerta a escala, mirá qué plantas se llevan bien y mantenelas vivas con recordatorios.", v: () => big("sprout") },
+    { t: "Dibujá tu espacio", p: "Poné el ancho y el largo reales. Cada cuadradito mide 10 cm, así que lo que entra en la pantalla entra en tu patio.",
+      v: () => { const sp = spaceById("front") || state.spaces[0]; return sp ? sandboxSVG(sp, Math.min(200 / sp.w, 130 / sp.l), { mini: true }) : big("ruler"); } },
+    { t: "Agregá y mové plantas", p: "Tocá + para agregar una planta con su tamaño adulto. Arrastrala para moverla. Tocala para cambiar su tamaño o ponerla en maceta.",
+      v: () => `<div style="display:flex;align-items:center;gap:18px"><span class="tool primary" style="width:52px;height:52px">${icon("plus")}</span><svg width="150" height="80" viewBox="0 0 150 80" aria-hidden="true"><circle cx="30" cy="40" r="22" fill="#C8553D" fill-opacity=".25" stroke="#C8553D" stroke-width="1.5"/><path d="M56 40h52" stroke="var(--ink-3)" stroke-width="2" stroke-dasharray="4 4"/><path d="M104 34l8 6-8 6" fill="none" stroke="var(--ink-3)" stroke-width="2"/><circle cx="130" cy="40" r="16" fill="var(--pot-soil)" stroke="var(--pot)" stroke-width="5"/></svg></div>` },
+    { t: "Leé el plano", p: "Un círculo con ! quiere decir que una planta necesita atención: están muy juntas, les falta sol, no les va el suelo o se expanden. Tocala para ver por qué. Muchos problemas se arreglan con un toque, como pasarla a una maceta.",
+      v: () => `<div class="legend" style="flex-direction:column;gap:12px;font-size:14px"><span><i class="lg-issue" style="width:20px;height:20px;font-size:13px">!</i>Necesita atención</span><span>${potGlyph()}En maceta: raíces y tierra aparte</span><span><i class="lg-good"></i>Buena pareja</span></div>` },
+    { t: "Sol y clima", p: "Empezamos en Mendoza. Elegí tu ciudad para que Saphi sepa el ángulo del sol, tu sombra, tu suelo y el pronóstico. Podés cambiarla después en Perfil.",
+      v: () => `<div style="width:100%;padding:0 16px;display:flex;flex-direction:column;gap:10px">${locationHTML()}</div>` },
+    { t: "Crecé y ahorrá", p: "Los logros siguen tu progreso. Con Saphi Plus, algunos te descuentan 20% del mes siguiente, de forma automática.",
+      v: () => `<div style="display:flex;gap:10px">${["leaf", "shield", "sun"].map((i, n) => `<span class="medal tier" style="width:54px;height:54px;border-radius:18px;display:grid;place-items:center;background:var(--good-bg);color:var(--leaf);position:relative">${icon(i)}<span class="num-badge">${["I", "II", "III"][n]}</span></span>`).join("")}</div>` },
+  ];
+  function drawTour() {
+    const el = $("#tour");
+    if (tourStep >= TOUR.length) { endTour(true); return; }
+    const s = TOUR[tourStep], last = tourStep === TOUR.length - 1;
+    el.innerHTML = `<div class="tour-card">
+      <div class="tour-visual">${s.v()}</div>
+      <div class="dots" aria-hidden="true">${TOUR.map((_, i) => `<i class="${i === tourStep ? "on" : ""}"></i>`).join("")}</div>
+      <div><h2 id="tour-title">${s.t}</h2><p style="margin-top:6px">${s.p}</p></div>
+      <div class="tour-nav">
+        ${tourStep ? `<button class="btn" data-act="tour-back">Atrás</button>` : `<button class="btn" data-act="tour-end">Saltar</button>`}
+        <span class="faint mono num">${tourStep + 1} / ${TOUR.length}</span>
+        <button class="btn primary" data-act="${last ? "tour-end" : "tour-next"}" data-finish="${last}">${last ? "Empezar a planificar" : "Siguiente"}</button>
+      </div>
+    </div>`;
+    el.hidden = false;
+    const f = el.querySelector(".btn.primary"); if (f) f.focus({ preventScroll: true });
+  }
+  function endTour(toGarden) {
+    const el = $("#tour"), wasLast = tourStep >= TOUR.length - 1;
+    el.hidden = true; el.innerHTML = "";
+    state.tutorialDone = true; save();
+    if (toGarden || wasLast) { if (route() !== "garden") location.hash = "garden"; else render(); }
+  }
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#tour").hidden) { tourStep = 0; endTour(false); } });
+
+  window.addEventListener("hashchange", render);
+  let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { const r = route(); if (r === "garden" || r === "harvest") drawSpace(r, { keepSheet: true }); }, 120); });
+  render();
+  if (!state.tutorialDone) drawTour();
+})();
+</script>
