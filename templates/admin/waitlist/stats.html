@@ -1,0 +1,27 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="results">
+  <table id="result_list">
+    <thead>
+      <tr>
+        <th><div class="text">{% translate "Vivero" %}</div></th>
+        <th><div class="text">{% translate "Visitas" %}</div></th>
+        <th><div class="text">{% translate "Anotados" %}</div></th>
+        <th><div class="text">{% translate "Conversión" %}</div></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr class="{% cycle 'row1' 'row2' %}">
+        <td>{{ row.label }}</td>
+        <td>{{ row.visits }}</td>
+        <td>{{ row.signups }}</td>
+        <td>{{ row.conversion }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

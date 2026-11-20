@@ -119,7 +119,3 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Public contact shown on the privacy page (Ley 25.326 deletion requests).
 FOUNDER_CONTACT_EMAIL = env("FOUNDER_CONTACT_EMAIL", default="hola@saphi.example")
-
-# Scheme + host used when building absolute URLs for QR codes. Render sets
-# this to the production URL so printed codes keep working forever.
-SITE_BASE_URL = env("SITE_BASE_URL", default="http://localhost:8000")
