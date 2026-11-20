@@ -1,0 +1,82 @@
+{% load i18n %}
+<form method="post" action="{{ request.path }}"
+      hx-post="{{ request.path }}" hx-target="#signup-box" hx-swap="outerHTML"
+      novalidate>
+  {% csrf_token %}
+  <div class="form">
+
+    <div class="field full">
+      <label for="id_name">{% translate "Tu nombre" %}</label>
+      <input type="text" name="name" id="id_name" autocomplete="name"
+             value="{{ form.name.value|default:"" }}" required>
+      {% for e in form.name.errors %}<span class="err">{{ e }}</span>{% endfor %}
+    </div>
+
+    <div class="field full">
+      <label for="id_whatsapp">{% translate "Tu WhatsApp" %}</label>
+      <input type="tel" name="whatsapp" id="id_whatsapp" inputmode="tel"
+             autocomplete="tel" value="{{ form.whatsapp.value|default:"" }}" required>
+      <span class="hint">{% translate "Ej: 261 555 1234" %}</span>
+      {% for e in form.whatsapp.errors %}<span class="err">{{ e }}</span>{% endfor %}
+    </div>
+
+    <div class="field">
+      <label for="id_zone">{% translate "Zona" %}</label>
+      <select name="zone" id="id_zone" required>
+        <option value="" {% if not form.zone.value %}selected{% endif %} disabled>{% translate "Elegí tu zona" %}</option>
+        {% for value, label in form.fields.zone.choices %}
+          <option value="{{ value }}" {% if form.zone.value == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      {% for e in form.zone.errors %}<span class="err">{{ e }}</span>{% endfor %}
+    </div>
+
+    <div class="field">
+      <label for="id_space_type">{% translate "Tu espacio" %}</label>
+      <select name="space_type" id="id_space_type" required>
+        <option value="" {% if not form.space_type.value %}selected{% endif %} disabled>{% translate "Elegí una opción" %}</option>
+        {% for value, label in form.fields.space_type.choices %}
+          <option value="{{ value }}" {% if form.space_type.value == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      {% for e in form.space_type.errors %}<span class="err">{{ e }}</span>{% endfor %}
+    </div>
+
+    <div class="field full">
+      <label for="id_irrigation">{% translate "Cómo regás" %} <span class="faint">({% translate "opcional" %})</span></label>
+      <select name="irrigation" id="id_irrigation">
+        <option value="" {% if not form.irrigation.value %}selected{% endif %}>{% translate "Elegí una opción" %}</option>
+        {% for value, label in form.fields.irrigation.choices %}
+          <option value="{{ value }}" {% if form.irrigation.value == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="field full">
+      <label>{% translate "Te interesa" %} <span class="faint">({% translate "opcional" %})</span></label>
+      <div class="choices">
+        {% for value, label in form.fields.interests.choices %}
+          <label>
+            <input type="checkbox" name="interests" value="{{ value }}"
+                   {% if form.interests.value and value in form.interests.value %}checked{% endif %}>
+            <span class="opt">{{ label }}</span>
+          </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="field full">
+      <label class="consent" for="id_consent">
+        <input type="checkbox" name="consent" id="id_consent"
+               {% if form.consent.value %}checked{% endif %} required>
+        <span class="grow">{% translate "Acepto que Saphi me escriba por WhatsApp sobre la app y el clima. Puedo darme de baja cuando quiera." %}</span>
+      </label>
+      {% for e in form.consent.errors %}<span class="err">{{ e }}</span>{% endfor %}
+    </div>
+
+    <div class="field full">
+      <button class="btn primary" type="submit">{% translate "Avisame por WhatsApp" %}</button>
+    </div>
+
+  </div>
+</form>

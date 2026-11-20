@@ -1,0 +1,44 @@
+{% load static i18n %}<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{% block title %}Saphi{% endblock %}</title>
+<meta name="description" content="{% translate "Saphi te ayuda a planificar tu jardín o huerta y cuidar tus plantas con el clima de Mendoza." %}">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#1F4A34">
+<link rel="icon" type="image/png" href="{% static 'icons/icon-192.png' %}">
+<link rel="apple-touch-icon" href="{% static 'icons/icon-192.png' %}">
+<link rel="stylesheet" href="{% static 'css/tokens.css' %}">
+<link rel="stylesheet" href="{% static 'css/fonts.css' %}">
+<link rel="stylesheet" href="{% static 'css/app.css' %}">
+<script>
+/* Theme before first paint: stored choice, else auto by local time (07:00-19:00 = day). */
+(function () {
+  var m = null;
+  try { m = localStorage.getItem("saphi-mode"); } catch (e) { /* storage unavailable */ }
+  if (m !== "day" && m !== "night") {
+    var h = new Date().getHours();
+    m = h >= 7 && h < 19 ? "day" : "night";
+  }
+  document.documentElement.dataset.mode = m;
+})();
+</script>
+<script src="{% static 'vendor/htmx.min.js' %}" defer></script>
+</head>
+<body>
+{% include "icons.html" %}
+<div class="app">
+  <main class="screens">
+    <div class="view">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+</div>
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js");
+}
+</script>
+</body>
+</html>

@@ -1,5 +1,6 @@
 """Core views: health check, PWA surface, and the privacy page."""
 
+from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_GET
@@ -18,6 +19,12 @@ def manifest(request):
         "core/manifest.webmanifest",
         content_type="application/manifest+json",
     )
+
+
+@require_GET
+def privacy(request):
+    """Plain-Spanish privacy page (what is stored, why, how to delete)."""
+    return render(request, "core/privacy.html", {"founder_email": settings.FOUNDER_CONTACT_EMAIL})
 
 
 @require_GET

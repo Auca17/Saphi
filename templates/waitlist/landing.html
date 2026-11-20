@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<header class="brand">
+  <span class="mark" aria-hidden="true"><svg class="ic"><use href="#i-leaf"/></svg></span>
+  <b>Saphi</b>
+</header>
+
+{% if nursery %}
+<p><span class="reco"><svg class="ic sm" aria-hidden="true"><use href="#i-check"/></svg>
+  {% blocktranslate with name=nursery.name %}Te lo recomienda {{ name }}{% endblocktranslate %}
+</span></p>
+{% endif %}
+
+<section class="section">
+  <h1>{% translate "Planificá tu patio y enterate qué hacer cuando viene granizo" %}</h1>
+  <p class="muted">{% translate "Saphi te ayuda a elegir qué plantar, dónde, y cómo cuidarlo con el clima de Mendoza. Es gratis." %}</p>
+</section>
+
+<section class="panel glass" aria-label="{% translate "Qué hace Saphi" %}">
+  <div class="benefit">
+    <span class="bic" aria-hidden="true"><svg class="ic"><use href="#i-ruler"/></svg></span>
+    <p>{% translate "Tu espacio a escala" %}</p>
+  </div>
+  <div class="benefit">
+    <span class="bic" aria-hidden="true"><svg class="ic"><use href="#i-bell"/></svg></span>
+    <p>{% translate "Avisos de granizo, Zonda y helada" %}</p>
+  </div>
+  <div class="benefit">
+    <span class="bic" aria-hidden="true"><svg class="ic"><use href="#i-sprout"/></svg></span>
+    <p>{% translate "Qué sembrar cada mes" %}</p>
+  </div>
+</section>
+
+<section class="panel glass">
+  {% include "waitlist/_signup_box.html" %}
+</section>
+
+<footer class="foot">
+  <a class="link" href="{% url "privacy" %}">{% translate "Privacidad" %}</a>
+</footer>
+{% endblock %}

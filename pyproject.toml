@@ -25,6 +25,7 @@ dev = [
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+extend-exclude = ["**/migrations/**"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "W", "B", "S", "C4", "DTZ", "T20"]
@@ -42,3 +43,4 @@ ignore = [
 DJANGO_SETTINGS_MODULE = "config.settings"
 testpaths = ["apps", "tests"]
 python_files = ["test_*.py", "tests.py"]
+filterwarnings = ["ignore:No directory at.*staticfiles:UserWarning"]
