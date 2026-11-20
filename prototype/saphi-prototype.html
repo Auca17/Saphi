@@ -17,7 +17,7 @@
   --f-body: "Figtree", "Segoe UI", system-ui, sans-serif;
   --f-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
   --r-lg: 22px; --r-md: 16px; --r-sm: 12px;
-  --ease: cubic-bezier(.16,1,.3,1);
+  --ease: cubic-bezier(.16,1,.3,1); --ease-in: cubic-bezier(.7,0,.84,0);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -70,7 +70,7 @@ body::before {
 ::selection { background: var(--forest); color: var(--forest-ink); }
 * { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
 button, input { font: inherit; color: inherit; }
-button { cursor: pointer; background: none; border: 0; padding: 0; }
+button { cursor: pointer; background: none; border: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; border-radius: 10px; }
 .ic { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 .ic.sm { width: 16px; height: 16px; }
@@ -83,7 +83,7 @@ button { cursor: pointer; background: none; border: 0; padding: 0; }
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 18px 112px;
 }
-.view { display: flex; flex-direction: column; gap: 18px; animation: rise .5s var(--ease) both; }
+.view { display: flex; flex-direction: column; gap: 18px; animation: rise .22s var(--ease) both; }
 @keyframes rise { from { opacity: .6; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
 .glass {
@@ -105,25 +105,26 @@ p { margin: 0; }
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .title-row { display: flex; align-items: center; gap: 10px; min-width: 0; flex-wrap: wrap; }
 .chip-btn {
-  display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px 0 14px;
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 12px 0 14px;
   border-radius: 999px; font-weight: 600; font-size: 14px; max-width: 100%;
 }
 .chip-btn span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dims { display: flex; gap: 12px; flex-wrap: wrap; color: var(--ink-2); }
-.row a.icon-btn .ic { transform: rotate(-90deg); }
-.icon-btn { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: var(--ink-2); flex: none; }
+.dims { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; color: var(--ink-2); }
+.dchip { position: relative; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 999px; background: var(--line); color: var(--ink); font-weight: 600; font-size: 13px; }
+.dchip::after { content: ""; position: absolute; inset: -6px -2px; }
+.rot { transform: rotate(-90deg); }
+.icon-btn { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: var(--ink-2); flex: none; }
 
 /* sandbox */
-.sandbox-row { display: grid; grid-template-columns: minmax(0,1fr) 48px; gap: 10px; align-items: start; }
+.sandbox-row { position: relative; display: grid; grid-template-columns: minmax(0,1fr) 52px; gap: 10px; align-items: start; }
 .stage { min-width: 0; display: flex; justify-content: center; align-items: flex-start; }
 .stage svg { display: block; touch-action: none; user-select: none; -webkit-user-select: none; overflow: visible; }
 .tools { display: flex; flex-direction: column; gap: 8px; padding: 4px; border-radius: 999px; }
-.tool { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: var(--ink-2); position: relative; transition: background-color .2s, color .2s, transform .2s var(--ease); }
+.tool { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: var(--ink-2); position: relative; transition: background-color .15s, color .15s, transform .1s var(--ease); }
 .tool:hover { background: var(--line); color: var(--ink); }
-.tool:active { transform: scale(.94); }
 .tool.primary { background: var(--forest); color: var(--forest-ink); box-shadow: 0 8px 18px -8px var(--forest); }
 .tool.primary:hover { background: var(--forest); filter: brightness(1.1); }
-.tool[aria-pressed="true"] { color: var(--leaf); background: var(--good-bg); }
+.tool[aria-pressed="true"], .tool[aria-expanded="true"] { color: var(--leaf); background: var(--good-bg); }
 .tool:disabled { opacity: .35; cursor: default; }
 .tool .badge { position: absolute; top: 2px; right: 1px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: var(--crit); color: var(--paper); font-size: 10px; font-weight: 600; display: grid; place-items: center; }
 
@@ -137,10 +138,25 @@ p { margin: 0; }
 .legend .lg-issue { background: var(--warn); }
 .legend .lg-sel { border: 2px solid var(--ink); }
 .legend .lg-good { width: 16px; height: 0; border-radius: 0; border-top: 2px dotted var(--good); }
+/* map key: a popover that grows from the "Referencias" tool button (origin set from JS) */
+.legend-pop {
+  position: absolute; z-index: 4; right: 62px; top: 0; max-width: calc(100% - 72px); padding: 12px 14px; border-radius: var(--r-md);
+  background: var(--glass-strong); flex-direction: column; flex-wrap: nowrap; gap: 10px; font-size: 13px;
+  opacity: 0; visibility: hidden; transform: scale(.9); transform-origin: 100% 22px;
+  transition: opacity .15s var(--ease-in), transform .15s var(--ease-in), visibility 0s .15s;
+}
+.legend-pop.open { opacity: 1; visibility: visible; transform: none; transition: opacity .2s var(--ease), transform .24s var(--ease), visibility 0s; }
 
 /* tutorial */
 .tour { position: absolute; z-index: 50; inset: 0; display: grid; place-items: end center; padding: 16px max(12px, env(safe-area-inset-right, 0px)) 16px max(12px, env(safe-area-inset-left, 0px)); background: var(--scrim); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
-.tour-card { width: 100%; border-radius: 28px; padding: 22px 20px 18px; background: var(--glass-strong); display: flex; flex-direction: column; gap: 14px; animation: rise .5s var(--ease) both; }
+.tour-card { width: 100%; border-radius: 28px; padding: 22px 20px 18px; background: var(--glass-strong); display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
+.tour-card.first { animation: rise .5s var(--ease) both; }
+.tour-slide { display: flex; flex-direction: column; gap: 14px; }
+.tour-slide.from-r { --dx: 28px; animation: slideIn .28s var(--ease) both; }
+.tour-slide.from-l { --dx: -28px; animation: slideIn .28s var(--ease) both; }
+@keyframes slideIn { from { opacity: 0; transform: translateX(var(--dx)); } }
+.tour-card h2 .w { display: inline-block; animation: wordIn .36s var(--ease) both; animation-delay: calc(var(--i) * 40ms + 60ms); }
+@keyframes wordIn { from { opacity: 0; filter: blur(6px); transform: translateY(4px); } to { opacity: 1; filter: none; transform: none; } }
 .tour-visual { height: 150px; border-radius: 20px; background: var(--paper-2); display: grid; place-items: center; overflow: hidden; }
 .tour-card h2 { font-size: 24px; }
 .tour-card p { color: var(--ink-2); }
@@ -148,11 +164,12 @@ p { margin: 0; }
 .dots i { width: 6px; height: 6px; border-radius: 3px; background: var(--line); transition: width .3s var(--ease), background-color .3s; }
 .dots i.on { width: 20px; background: var(--forest); }
 .tour-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.tour-nav .btn:not(.primary) { min-width: 84px; }
 .tour-nav .btn.primary { flex: none; padding: 0 22px; }
 
 /* sow this month */
 .sow { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 8px; margin: 0 -2px; scroll-snap-type: x mandatory; }
-.sow button { scroll-snap-align: start; display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px 0 12px; border-radius: 999px; white-space: nowrap; font-weight: 600; font-size: 14px; }
+.sow button { scroll-snap-align: start; flex: none; display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 14px 0 12px; border-radius: 999px; white-space: nowrap; font-weight: 600; font-size: 14px; }
 
 /* weather day buttons */
 button.fday { width: 100%; }
@@ -172,13 +189,12 @@ button.fday:hover { background: var(--line); }
 .sel-ring { stroke: var(--ink); fill: none; }
 
 /* stats strip */
-.stats { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); border-radius: var(--r-md); overflow: hidden; }
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); border-radius: var(--r-md); overflow: hidden; }
 .stat { padding: 12px 12px 11px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .stat + .stat { border-left: 1px solid var(--line); }
 .stat .label { font-size: 12px; color: var(--ink-2); display: flex; align-items: center; gap: 5px; }
 .stat .value { font-family: var(--f-display); font-weight: 650; font-size: 22px; line-height: 1.1; }
 .stat .sub { font-size: 12px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.stat.water .value { letter-spacing: .18em; color: var(--ink-3); }
 button.stat { text-align: left; }
 button.stat:hover { background: var(--line); }
 
@@ -194,9 +210,21 @@ button.stat:hover { background: var(--line); }
 .row .grow p { font-size: 13px; color: var(--ink-2); }
 .check {
   width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--ink-3); display: grid; place-items: center; flex: none;
-  color: transparent; transition: background-color .25s var(--ease), border-color .25s, color .25s;
+  color: var(--paper); position: relative; transition: background-color .2s var(--ease), border-color .2s, transform .1s var(--ease);
 }
-.check[aria-checked="true"] { background: var(--leaf); border-color: var(--leaf); color: var(--paper); }
+.check::after { content: ""; position: absolute; inset: -9px; } /* 44px hit area around the 26px box */
+.check path { stroke-dasharray: 1 2; stroke-dashoffset: 1; stroke-width: 2.2; }
+.check[aria-checked="true"] { background: var(--leaf); border-color: var(--leaf); }
+.check[aria-checked="true"] path { stroke-dashoffset: 0; }
+.check.just { animation: squash .12s ease-out; }
+.check.just path { animation: draw .2s .06s var(--ease) both; }
+@keyframes squash { 50% { transform: scale(1.14, .86); } }
+@keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.wx { display: flex; align-items: center; gap: 6px; }
+.wx .ic { color: var(--warn); }
+.more-btn { min-height: 44px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--leaf); font-weight: 600; font-size: 14px; border-top: 1px solid var(--line); border-radius: 0 0 16px 16px; }
+.more-btn .ic { transition: transform .2s var(--ease); }
+.more-btn[aria-expanded="true"] .ic { transform: rotate(180deg); }
 .task-done h3 { text-decoration: line-through; text-decoration-color: var(--ink-3); color: var(--ink-3); }
 .swatch { width: 12px; height: 12px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 22%, transparent); flex: none; }
 
@@ -208,15 +236,10 @@ button.stat:hover { background: var(--line); }
 
 /* home */
 .greet { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-.greet p { margin-top: 6px; }
-.streak { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: var(--r-lg); }
-.streak .flame { width: 42px; height: 42px; border-radius: 50%; background: color-mix(in srgb, var(--soil) 16%, transparent); color: var(--soil); display: grid; place-items: center; flex: none; }
-.weeks { display: flex; gap: 6px; margin-top: 8px; }
-.weeks i { width: 100%; max-width: 22px; height: 6px; border-radius: 3px; background: var(--line); }
-.weeks i.on { background: var(--leaf); }
-.weeks i.now { background: linear-gradient(90deg, var(--leaf) 60%, var(--line) 60%); }
+.greet p { margin-top: 6px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.pill.streak { background: color-mix(in srgb, var(--soil) 16%, transparent); color: var(--soil); }
 .spaces { display: grid; grid-auto-flow: column; grid-auto-columns: 168px; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 2px 2px 14px; margin: 0 -2px; }
-.space-card { scroll-snap-align: start; border-radius: var(--r-lg); padding: 12px; display: flex; flex-direction: column; gap: 10px; text-align: left; }
+.space-card { scroll-snap-align: start; text-decoration: none; color: inherit; border-radius: var(--r-lg); padding: 12px; display: flex; flex-direction: column; gap: 10px; text-align: left; }
 .space-card .thumb { height: 110px; display: grid; place-items: center; }
 .space-card h3 { font-size: 14px; }
 .space-card .meta { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
@@ -252,9 +275,20 @@ button.stat:hover { background: var(--line); }
 .herb h3 { font-size: 14px; }
 .herb .sci { font-size: 12px; }
 .herb .undisc { opacity: .5; border-style: dashed; box-shadow: none; }
+.coll { display: grid; grid-auto-flow: column; grid-auto-columns: 128px; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 2px 2px 10px; margin: 0 -2px; }
+.coll button { scroll-snap-align: start; border-radius: var(--r-md); padding: 12px; text-align: left; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.coll h3 { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stats-line { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 4px; font-size: 14px; color: var(--ink-2); }
+.stats-line b { color: var(--ink); font-weight: 600; }
+.plus-row { width: 100%; text-align: left; display: flex; align-items: center; gap: 12px; padding: 12px 8px 12px 16px; border-radius: var(--r-lg); min-height: 56px; }
+.plus-row .grow { flex: 1; min-width: 0; }
+.kv { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 11px 10px; }
+.kv + .kv { border-top: 1px solid var(--line); }
+.kv > span:first-child { color: var(--ink-2); font-size: 14px; }
+.kv > span:last-child { text-align: right; }
 .sci { font-style: italic; color: var(--ink-2); }
 .seg { display: grid; grid-template-columns: repeat(3, 1fr); padding: 4px; border-radius: 999px; gap: 4px; }
-.seg button { height: 36px; border-radius: 999px; font-weight: 600; font-size: 14px; color: var(--ink-2); display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.seg button { height: 44px; border-radius: 999px; font-weight: 600; font-size: 14px; color: var(--ink-2); display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .seg button[aria-pressed="true"] { background: var(--forest); color: var(--forest-ink); }
 .seg button:disabled { opacity: .5; cursor: default; }
 .setting { display: flex; flex-direction: column; gap: 8px; padding: 12px 10px; }
@@ -268,22 +302,29 @@ button.stat:hover { background: var(--line); }
   display: grid; grid-template-columns: repeat(4, 1fr); padding: 6px; border-radius: 26px;
   background: var(--glass-strong);
 }
-.nav a { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 7px 0 6px; border-radius: 20px; color: var(--ink-3); text-decoration: none; font-size: 11.5px; font-weight: 600; transition: color .25s, background-color .25s; }
+.nav a { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 7px 0 6px; border-radius: 20px; color: var(--ink-3); text-decoration: none; font-size: 11.5px; font-weight: 600; transition: color .15s, background-color .15s, transform .1s var(--ease); -webkit-tap-highlight-color: transparent; }
 .nav a[aria-current="page"] { color: var(--forest); background: var(--good-bg); }
 .nav a:hover { color: var(--ink); }
 
 /* sheet */
-.scrim { position: absolute; inset: 0; z-index: 30; background: var(--scrim); opacity: 0; transition: opacity .3s; }
-.scrim.show { opacity: 1; }
+.scrim { position: absolute; inset: 0; z-index: 30; background: var(--scrim); opacity: 0; transition: opacity .15s var(--ease-in); }
+.scrim.show { opacity: 1; transition: opacity .28s var(--ease); }
 .sheet {
   position: absolute; z-index: 31; left: 0; right: 0; bottom: 0; max-height: 84%;
   display: flex; flex-direction: column;
   border-radius: 26px 26px 0 0; background: var(--glass-strong);
   -webkit-backdrop-filter: blur(28px) saturate(1.4); backdrop-filter: blur(28px) saturate(1.4);
   border: 1px solid var(--glass-edge); border-bottom: 0; box-shadow: 0 -18px 40px -20px rgba(0,0,0,.35);
-  transform: translateY(105%); transition: transform .42s var(--ease); visibility: hidden;
+  transform: translateY(105%); visibility: hidden;
+  transition: transform .15s var(--ease-in), visibility 0s .15s; /* closing: fast, ease-in */
 }
-.sheet.open { transform: none; visibility: visible; }
+.sheet.open { transform: none; visibility: visible; transition: transform .28s var(--ease), visibility 0s; } /* opening: ease-out */
+/* follow-through: children trail the sheet in 30ms steps, only when the sheet was closed before */
+.sheet-body.enter > * { animation: follow .3s var(--ease) both; }
+.sheet-body.enter > :nth-child(2) { animation-delay: 30ms; }
+.sheet-body.enter > :nth-child(3) { animation-delay: 60ms; }
+.sheet-body.enter > :nth-child(n+4) { animation-delay: 90ms; }
+@keyframes follow { from { opacity: .2; transform: translateY(14px); } }
 .sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--line); margin: 8px auto 0; flex: none; }
 .sheet-body { overflow-y: auto; padding: 10px max(18px, env(safe-area-inset-right, 0px)) 22px max(18px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 16px; }
 .sh-head { display: flex; align-items: flex-start; gap: 12px; }
@@ -311,6 +352,17 @@ input[type=range]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 
 .btn:hover { filter: brightness(.97); }
 .btn.primary { background: var(--forest); color: var(--forest-ink); flex: 1; }
 .btn.danger { color: var(--crit); background: var(--crit-bg); }
+.btn.icon { width: 44px; padding: 0; flex: none; }
+/* disclosure: grid-rows transition, interruptible */
+.disc-btn { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 10px; font-weight: 600; }
+.disc-btn .ic { transition: transform .2s var(--ease); }
+.disc-btn[aria-expanded="true"] .ic { transform: rotate(180deg); }
+.disc-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .15s var(--ease-in); }
+.disc-body > div { min-height: 0; overflow: hidden; visibility: hidden; transition: visibility 0s .15s; display: flex; flex-direction: column; gap: 4px; }
+.disc.open .disc-body { grid-template-rows: 1fr; transition: grid-template-rows .24s var(--ease); }
+.disc.open .disc-body > div { visibility: visible; transition: visibility 0s; }
+.plant-in { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.plant-in .seg { flex: 1; max-width: 220px; }
 .search { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 14px; border-radius: 999px; background: var(--line); }
 .search input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; }
 .search input::placeholder { color: var(--ink-3); }
@@ -337,7 +389,7 @@ input[type=range]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 
   transition: transform .4s var(--ease); box-shadow: var(--shadow);
 }
 .toast.show { transform: translate(-50%, 0); }
-.toast button { height: 32px; padding: 0 12px; border-radius: 999px; background: color-mix(in srgb, var(--paper) 16%, transparent); font-weight: 600; }
+.toast button { height: 36px; padding: 0 12px; border-radius: 999px; background: color-mix(in srgb, var(--paper) 16%, transparent); font-weight: 600; }
 .toast button[hidden] { display: none; }
 .emo { font-family: "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", sans-serif; font-style: normal; line-height: 1; }
 .pemo { width: 38px; height: 38px; border-radius: 13px; display: grid; place-items: center; font-size: 21px; background: color-mix(in srgb, var(--c) 16%, transparent); flex: none; }
@@ -381,8 +433,72 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
 
 .example { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3); }
 
+/* sticky title row: shrinks and gains glass once the screen scrolls (class set from a passive scroll listener) */
+.appbar {
+  position: sticky; top: calc(env(safe-area-inset-top, 0px) - 18px); z-index: 6; /* -18px cancels the scroller's top padding */
+  margin: -18px calc(-1 * max(16px, env(safe-area-inset-right, 0px))) 0 calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+  padding: 18px max(16px, env(safe-area-inset-right, 0px)) 6px max(16px, env(safe-area-inset-left, 0px));
+  border-bottom: 1px solid transparent; background: transparent;
+  transition: background-color .2s var(--ease), border-color .2s, box-shadow .2s, padding .2s var(--ease);
+}
+.appbar h1 { transition: font-size .2s var(--ease); }
+.appbar.stuck { padding-block: 10px 8px; background: var(--glass-strong); border-bottom-color: var(--line); box-shadow: 0 10px 24px -20px rgba(0,0,0,.4); -webkit-backdrop-filter: blur(18px) saturate(1.3); backdrop-filter: blur(18px) saturate(1.3); }
+.appbar.stuck h1 { font-size: 20px; }
+.appbar.stuck .hide-stuck { display: none; }
+
+/* press feedback for every tappable control (specific rules above add transform to their own transitions) */
+:where(button, a.icon-btn, a.space-card, label.slot) { transition: transform .1s var(--ease), background-color .15s, color .15s, filter .15s; }
+:where(button, a.icon-btn, a.space-card, .nav a, label.slot):active:not(:disabled) { transform: scale(.96); }
+.switch { transition: background-color .2s, transform .1s var(--ease); }
+
+/* stagger: list rows entering a view or an expanded list, 40ms apart, capped at 6 */
+@keyframes itemIn { from { opacity: 0; transform: translateY(6px); } }
+.view.enter .stg > *, .rowin { animation: itemIn .22s var(--ease) both; }
+.view.enter .stg > :nth-child(2) { animation-delay: 40ms; } .view.enter .stg > :nth-child(3) { animation-delay: 80ms; }
+.view.enter .stg > :nth-child(4) { animation-delay: 120ms; } .view.enter .stg > :nth-child(5) { animation-delay: 160ms; }
+.view.enter .stg > :nth-child(n+6) { animation-delay: 200ms; }
+.rowin { animation-delay: calc(min(var(--i, 0), 5) * 40ms); }
+
+/* plant drag: lift on grab, squash-settle on drop */
+.pl-b { transform-box: fill-box; transform-origin: center; transition: transform .12s var(--ease), filter .12s; }
+.pl.lift .pl-b { transform: scale(1.04); filter: drop-shadow(0 5px 6px rgba(0,0,0,.2)); }
+.pl.settle .pl-b { animation: settle .12s ease-out; }
+@keyframes settle { 0% { transform: scale(1.06, .94); } 100% { transform: none; } }
+
+/* click spark (decorative) */
+.spark { position: fixed; z-index: 60; width: 0; height: 0; pointer-events: none; }
+.spark i { position: absolute; left: -1px; top: -3.5px; width: 2px; height: 7px; border-radius: 1px; background: var(--leaf); transform: rotate(var(--a)) translateY(-15px); animation: spark .35s var(--ease) forwards; }
+@keyframes spark { to { opacity: 0; transform: rotate(var(--a)) translateY(-25px) scaleY(.3); } }
+
+/* peak-end: the day's last task */
+.done-moment {
+  position: absolute; z-index: 45; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 72px);
+  display: flex; align-items: center; gap: 12px; padding: 10px 20px 10px 10px; border-radius: 999px; background: var(--glass-strong);
+  opacity: 0; visibility: hidden; transform: translate(-50%, -8px) scale(.96);
+  transition: opacity .15s var(--ease-in), transform .15s var(--ease-in), visibility 0s .15s;
+}
+.done-moment.show { opacity: 1; visibility: visible; transform: translate(-50%, 0); transition: opacity .2s var(--ease), transform .3s var(--ease), visibility 0s; }
+.done-moment .ring { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--leaf); color: var(--paper); flex: none; }
+.done-moment .ring svg { width: 26px; height: 26px; }
+.done-moment path { stroke-dasharray: 1 2; stroke-dashoffset: 0; stroke-width: 2.4; }
+.done-moment.show .ring { animation: pop .4s var(--ease) both; }
+.done-moment.show path { animation: draw .6s .12s var(--ease) both; }
+@keyframes pop { from { transform: scale(.6); } 60% { transform: scale(1.12); } to { transform: none; } }
+.done-moment b { font-family: var(--f-display); font-weight: 650; font-size: 17px; white-space: nowrap; }
+
+/* scroll-driven blur-in and mask reveal: only where supported; otherwise everything is simply visible */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .view > .section { animation: blurIn linear both; animation-timeline: view(); animation-range: entry 0% entry 70%; }
+    @keyframes blurIn { from { filter: blur(6px); opacity: .4; } to { filter: none; opacity: 1; } }
+    .tl .bar > i { animation: maskIn linear both; animation-timeline: view(); animation-range: entry 20% cover 35%; }
+    @keyframes maskIn { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  *, *::before, *::after { animation-duration: .001ms !important; animation-delay: 0s !important; transition-duration: .001ms !important; }
+  :where(button, a.icon-btn, a.space-card, .nav a, label.slot):active:not(:disabled) { transform: none; }
 }
 </style>
 
@@ -412,6 +528,8 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
   <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.5 19 6v5.5c0 4.5-3 7.7-7 9-4-1.3-7-4.5-7-9V6z"/><path d="M9 12l2.2 2.2L15.5 10"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5.5" y="10.5" width="13" height="10" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></symbol>
   <symbol id="i-ruler" viewBox="0 0 24 24"><path d="M3.5 15.5 15.5 3.5l5 5-12 12z"/><path d="M7.5 11.5l2 2M10.5 8.5l2 2M13.5 5.5l2 2"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5M12 7.8v.2"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol>
   <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 17.5a4.5 4.5 0 0 1-.4-9 5.5 5.5 0 0 1 10.6 1.5A3.8 3.8 0 0 1 17 17.5z"/><path d="M9 20.5l1-1.5M13 20.5l1-1.5"/></symbol>
 </svg>
 
@@ -432,6 +550,7 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
   </section>
 
   <div class="tour" id="tour" role="dialog" aria-modal="true" aria-labelledby="tour-title" hidden></div>
+  <div class="done-moment glass" id="done-moment" role="status" aria-live="polite"><span class="ring" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><path pathLength="1" d="M5 12.5 10 17.5 19 7"/></svg></span><b id="done-msg"></b></div>
   <div class="toast" id="toast" role="status" aria-live="polite"><span id="toast-msg"></span><button id="toast-act" hidden>Deshacer</button></div>
 </div>
 
@@ -574,13 +693,16 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
   const KEY = "saphi-proto-v1";
   let state;
   try { state = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) { state = null; }
-  const EXTRA = () => ({ location: null, season: "today", showShadows: false, sunStudy: {}, precDone: {}, tutorialDone: false });
+  const EXTRA = () => ({ location: null, season: "today", showShadows: false, sunStudy: {}, precDone: {}, tutorialDone: false, legendSeen: false });
   if (!state || state.v !== 3 || !Array.isArray(state.spaces)) state = SEED();
   state = Object.assign(EXTRA(), state);
   const photos = {}; // object URLs of sun-study photos, kept in memory only
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* storage unavailable: keep in memory */ } };
   const history = {};
   let selected = null;
+  // View-only UI state (not persisted): expanded lists, the size disclosure, which plant just landed, which rows animate in
+  const ui = { tasksOpen: false, tlOpen: false, achOpen: false, sizeOpen: false, rowsFrom: null, justDone: null };
+  let settleUid = null;
 
   const $ = (s, el = document) => el.querySelector(s);
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -593,6 +715,38 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
   const cap = (s) => s ? s[0].toUpperCase() + s.slice(1) : s;
   const irrigationOf = (sp) => sp.irrigation === "goteo" ? "goteo" : "manguera";
   const waterAvg = (sp) => sp.plants.length ? sp.plants.reduce((a, p) => a + CATALOG[p.pid].water, 0) / sp.plants.length : null;
+
+  /* ---------- Motion helpers ---------- */
+  const reduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Count up: animates only the first time a number is shown this session, or when its value changes
+  const counted = {};
+  function runCounts(root) {
+    root.querySelectorAll("[data-count]").forEach((el) => {
+      const to = +el.dataset.count, key = el.dataset.ckey, suf = el.dataset.suf || "";
+      const from = counted[key]; counted[key] = to;
+      if (from === to || reduceMotion()) { el.textContent = to + suf; return; }
+      const start = from == null ? 0 : from, t0 = performance.now(), D = 450;
+      el.textContent = start + suf;
+      const step = (now) => {
+        const k = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - k, 3);
+        el.textContent = Math.round(start + (to - start) * e) + suf;
+        if (k < 1 && el.isConnected) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    });
+  }
+  const countHTML = (v, key, suf = "") => `<span class="num" data-count="${v}" data-ckey="${key}" data-suf="${suf}">${v}${suf}</span>`;
+  // Click spark: 8 short dashes burst around a point, decorative only
+  function spark(el) {
+    if (!el || reduceMotion()) return;
+    const r = el.getBoundingClientRect(), s = document.createElement("span");
+    s.className = "spark"; s.setAttribute("aria-hidden", "true");
+    s.style.left = r.left + r.width / 2 + "px"; s.style.top = r.top + r.height / 2 + "px";
+    s.innerHTML = Array.from({ length: 8 }, (_, i) => `<i style="--a:${i * 45}deg"></i>`).join("");
+    document.body.appendChild(s); setTimeout(() => s.remove(), 400);
+  }
+  // Inline check path (pathLength 1) so the stroke can draw in
+  const checkSVG = () => `<svg class="ic sm" viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M5 12.5 10 17.5 19 7"/></svg>`;
 
   /* ---------- Theme by local time ---------- */
   function resolvedMode() {
@@ -789,7 +943,7 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
     for (const p of order) {
       const c = CATALOG[p.pid];
       const flag = opts.flags && opts.flags[p.uid];
-      s += `<g class="pl" data-uid="${p.uid}" transform="translate(${p.x} ${p.y})"${mini ? "" : ` tabindex="0" role="button" aria-label="${esc(c.name)}, ${p.sx} por ${p.sy} cm${p.pot ? `, en maceta de ${p.pot} cm` : ""}${flag ? ", necesita atención" : ""}"`}>`;
+      s += `<g class="pl${!mini && settleUid === p.uid ? " settle" : ""}" data-uid="${p.uid}" transform="translate(${p.x} ${p.y})"${mini ? "" : ` tabindex="0" role="button" aria-label="${esc(c.name)}, ${p.sx} por ${p.sy} cm${p.pot ? `, en maceta de ${p.pot} cm` : ""}${flag ? ", necesita atención" : ""}"`}><g class="pl-b">`;
       if (p.pot) { // terracotta pot seen from above: soft drop shadow, rim, inner lip, soil
         const R = p.pot / 2, rim = Math.max(3 * px, Math.min(p.pot * 0.09, 6 * px));
         s += `<circle cy="${2 * px}" r="${R + px}" fill="#000" fill-opacity=".16"/>`;
@@ -810,7 +964,7 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
           s += `<g transform="translate(${bx} ${by})"><circle r="${7 * px}" fill="var(--${flag})" stroke="var(--bed)" stroke-width="${1.5 * px}"/><path d="M0 ${-3.6 * px}V${0.8 * px}M0 ${3.2 * px}v${0.1 * px}" stroke="var(--paper)" stroke-width="${1.8 * px}" stroke-linecap="round"/></g>`;
         }
       }
-      s += `</g>`;
+      s += `</g></g>`;
     }
     s += `</svg>`;
     return s;
@@ -827,6 +981,7 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
     if (!stage) return;
     const scale = stageScale(space, stage);
     stage.innerHTML = sandboxSVG(space, scale);
+    settleUid = null;
     stage._scale = scale;
     bindSandbox(space, stage.querySelector("svg"));
   }
@@ -838,27 +993,52 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
       const g = e.target.closest(".pl"); if (!g) return;
       const p = space.plants.find((q) => q.uid === g.dataset.uid); if (!p) return;
       const at = toCm(e);
-      drag = { g, p, dx: at.x - p.x, dy: at.y - p.y, sx: e.clientX, sy: e.clientY, moved: false, nx: p.x, ny: p.y };
+      drag = { g, p, dx: at.x - p.x, dy: at.y - p.y, sx: e.clientX, sy: e.clientY, moved: false, nx: p.x, ny: p.y, vx: p.x, vy: p.y };
+      g.classList.add("lift"); // lift on grab
       g.setPointerCapture(e.pointerId);
       e.preventDefault();
     });
+    // Rubber banding past the space edge: offset = (1 - 1 / (over * 0.55 / size + 1)) * size, size about 40 cm
+    const band = (v, lo, hi) => {
+      const S = 40, f = (o) => (1 - 1 / ((o * 0.55) / S + 1)) * S;
+      return v < lo ? lo - f(lo - v) : v > hi ? hi + f(v - hi) : null;
+    };
     svg.addEventListener("pointermove", (e) => {
       if (!drag) return;
       if (!drag.moved && Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) < 4) return;
       if (!drag.moved) { drag.moved = true; svg.classList.add("dragging"); }
       const at = toCm(e);
       const { p } = drag;
-      drag.nx = clamp(snap(at.x - drag.dx, space.cell), Math.min(p.sx / 2, space.w / 2), Math.max(space.w - p.sx / 2, space.w / 2));
-      drag.ny = clamp(snap(at.y - drag.dy, space.cell), Math.min(p.sy / 2, space.l / 2), Math.max(space.l - p.sy / 2, space.l / 2));
-      drag.g.setAttribute("transform", `translate(${drag.nx} ${drag.ny})`);
+      const rx = at.x - drag.dx, ry = at.y - drag.dy;
+      const loX = Math.min(p.sx / 2, space.w / 2), hiX = Math.max(space.w - p.sx / 2, space.w / 2);
+      const loY = Math.min(p.sy / 2, space.l / 2), hiY = Math.max(space.l - p.sy / 2, space.l / 2);
+      drag.nx = clamp(snap(rx, space.cell), loX, hiX);
+      drag.ny = clamp(snap(ry, space.cell), loY, hiY);
+      const bx = band(rx, loX, hiX), by = band(ry, loY, hiY);
+      drag.vx = bx == null ? drag.nx : bx; drag.vy = by == null ? drag.ny : by;
+      drag.g.setAttribute("transform", `translate(${drag.vx} ${drag.vy})`);
     });
+    const commit = (d) => {
+      if (d.nx !== d.p.x || d.ny !== d.p.y) { pushHistory(space); d.p.x = d.nx; d.p.y = d.ny; save(); }
+      settleUid = d.p.uid; // squash-settle on drop
+      drawSpace(space.kind, { keepSheet: true });
+      if (selected === d.p.uid) refreshPlantIssues(space);
+    };
     const end = () => {
       if (!drag) return;
       const d = drag; drag = null;
+      d.g.classList.remove("lift");
       if (d.moved) {
-        if (d.nx !== d.p.x || d.ny !== d.p.y) { pushHistory(space); d.p.x = d.nx; d.p.y = d.ny; save(); }
-        drawSpace(space.kind, { keepSheet: true });
-        if (selected === d.p.uid) refreshPlantIssues(space);
+        const fx = d.vx, fy = d.vy;
+        if ((fx === d.nx && fy === d.ny) || reduceMotion()) { commit(d); return; }
+        // spring back from the stretched position (small overshoot), then commit
+        const t0 = performance.now(), D = 220, c1 = 1.5, c3 = c1 + 1;
+        const step = (now) => {
+          const k = Math.min(1, (now - t0) / D), e = 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2);
+          d.g.setAttribute("transform", `translate(${fx + (d.nx - fx) * e} ${fy + (d.ny - fy) * e})`);
+          if (k < 1 && d.g.isConnected) requestAnimationFrame(step); else commit(d);
+        };
+        requestAnimationFrame(step);
       } else {
         openPlant(space, d.p.uid);
       }
@@ -890,11 +1070,27 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
     selected = null; closeSheet(true);
     document.querySelectorAll(".nav a").forEach((a) => { if (a.dataset.view === r) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
     view.style.animation = "none"; void view.offsetWidth; view.style.animation = "";
+    // rows stagger in only when a view is entered, not on every redraw
+    view.classList.add("enter"); clearTimeout(render.t); render.t = setTimeout(() => view.classList.remove("enter"), 500);
+    ui.tasksOpen = ui.tlOpen = ui.achOpen = false;
     if (r === "home") renderHome();
     else if (r === "profile") renderProfile();
     else renderSpace(r);
-    $("#screens").scrollTop = 0;
+    $("#screens").scrollTop = 0; onScroll();
   }
+
+  /* Shrink header: toggled from a passive, rAF-throttled scroll listener */
+  const screens = $("#screens");
+  let scrollTick = false;
+  function onScroll() {
+    const bar = view.querySelector(".appbar"); if (bar) bar.classList.toggle("stuck", screens.scrollTop > 24);
+    scrollTick = false;
+  }
+  screens.addEventListener("scroll", () => { if (!scrollTick) { scrollTick = true; requestAnimationFrame(onScroll); } }, { passive: true });
+
+  // Extra rows revealed by "Ver todas" stagger in, 40ms apart
+  const rowIn = (i) => ui.rowsFrom != null && i >= ui.rowsFrom ? ` rowin" style="--i:${i - ui.rowsFrom}` : "";
+  const moreBtn = (act, open, total, label) => `<button class="more-btn" data-act="${act}" aria-expanded="${open}">${open ? "Ver menos" : `${label} (${total})`}${icon("chev", "sm")}</button>`;
 
   function greeting() { const h = new Date().getHours(); return h < 12 ? "Buen día" : h < 19 ? "Buenas tardes" : "Buenas noches"; }
 
@@ -929,37 +1125,65 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
     const key = today.toISOString().slice(0, 10);
     return t.map((x) => ({ ...x, done: !!(state.tasksDone[key] || {})[x.id], key }));
   }
+  // Today's list: care tasks plus weather precautions (each keeps its own state key: tasksDone or precDone)
+  function todoItems() {
+    const precs = precautions().map((p) => {
+      const f = FORECAST.find((x) => x.d === p.d);
+      return { id: p.id, act: "prec", d: p.d, wx: f ? f.ic : "cloud", title: p.short, meta: `${cap(dayLong(p.d))}${f && f.alert ? ` · ${f.alert}` : ""}`, done: !!state.precDone[p.id] };
+    });
+    const care = tasks().map((t) => ({ ...t, act: "task" }));
+    return [...precs.filter((p) => p.d <= 1), ...care, ...precs.filter((p) => p.d > 1)];
+  }
+  const todoLeft = () => todoItems().filter((t) => !t.done).length;
+
+  function toggleTodo(act, id) {
+    const before = todoLeft();
+    let nowDone;
+    if (act === "prec") nowDone = state.precDone[id] = !state.precDone[id];
+    else { const key = today.toISOString().slice(0, 10), day = (state.tasksDone[key] = state.tasksDone[key] || {}); nowDone = day[id] = !day[id]; }
+    save();
+    ui.justDone = nowDone ? id : null;
+    renderHome(); ui.justDone = null;
+    const again = document.querySelector(`[data-act="${act}"][data-id="${id}"]`);
+    if (again) { again.focus({ preventScroll: true }); if (nowDone) spark(again); }
+    if (nowDone && before > 0 && todoLeft() === 0) doneMoment();
+  }
+  // Peak-end: a short check-drawing moment when the day's last task is done
+  let doneT;
+  function doneMoment() {
+    const el = $("#done-moment");
+    el.classList.remove("show"); void el.offsetWidth;
+    $("#done-msg").textContent = "Todo listo por hoy";
+    el.classList.add("show"); clearTimeout(doneT);
+    doneT = setTimeout(() => el.classList.remove("show"), 2200);
+  }
 
   function renderHome() {
-    const ts = tasks();
-    const left = ts.filter((t) => !t.done).length;
-    const mode = resolvedMode();
+    const items = todoItems();
+    const doneN = items.filter((t) => t.done).length;
+    const shown = ui.tasksOpen ? items : items.slice(0, 3);
     const dateStr = cap(new Date().toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" }));
     const spaces = state.spaces;
+    const sow = sowNow();
     view.innerHTML = `
-      <header class="greet">
-        <div><h1>${greeting()}</h1><p class="muted">${dateStr} · ${left ? `${left} ${left === 1 ? "tarea" : "tareas"} para hoy` : "Todo listo por hoy"}</p></div>
-        <button class="icon-btn glass" data-act="cycle-mode" aria-label="Tema: ${state.mode === "auto" ? "automático según la hora local" : mode === "day" ? "día" : "noche"}">${icon(state.mode === "auto" ? "auto" : mode === "day" ? "sun" : "moon")}</button>
+      <header class="greet appbar">
+        <div><h1>${greeting()}</h1><p class="muted hide-stuck">${dateStr}<span class="pill streak" aria-label="Racha: 6 semanas seguidas cuidando">${icon("flame", "sm")}6 semanas</span></p></div>
       </header>
 
       <section class="section" aria-labelledby="today-h">
-        <div class="section-head"><h2 id="today-h">Hoy</h2><span class="faint num">${ts.length - left}/${ts.length}</span></div>
+        <div class="section-head"><h2 id="today-h">Hoy</h2><span class="faint num">${doneN}/${items.length}</span></div>
         <div class="panel glass">
-          ${ts.map((t) => `
-            <div class="row ${t.done ? "task-done" : ""}">
-              <button class="check" role="checkbox" aria-checked="${t.done}" aria-label="Marcar “${esc(t.title)}” como hecha" data-act="task" data-id="${t.id}">${icon("check", "sm")}</button>
-              <div class="grow"><h3>${esc(t.title)}</h3><p>${esc(t.meta)}</p></div>
-              <a class="icon-btn" href="#${t.go}" data-space="${t.space}" aria-label="Abrir ${esc(t.meta.split(" · ")[0])}">${icon("chev", "sm")}</a>
+          <div class="stg">
+          ${shown.map((t, i) => `
+            <div class="row ${t.done ? "task-done" : ""}${rowIn(i)}">
+              <button class="check${ui.justDone === t.id ? " just" : ""}" role="checkbox" aria-checked="${t.done}" aria-label="Marcar “${esc(t.title)}” como hecha" data-act="${t.act}" data-id="${t.id}">${checkSVG()}</button>
+              <div class="grow"><h3 class="${t.wx ? "wx" : ""}">${t.wx ? icon(t.wx, "sm") : ""}${esc(t.title)}</h3><p>${esc(t.meta)}</p></div>
+              ${t.act === "prec"
+                ? `<button class="icon-btn" data-act="day" data-d="${t.d}" aria-label="Qué hacer ${dayLong(t.d)}">${icon("chev", "sm rot")}</button>`
+                : `<a class="icon-btn" href="#${t.go}" data-space="${t.space}" aria-label="Abrir ${esc(t.meta.split(" · ")[0])}">${icon("chev", "sm rot")}</a>`}
             </div>`).join("")}
-        </div>
-      </section>
-
-      <section class="streak glass" aria-label="Racha de cuidado">
-        <div class="flame">${icon("flame")}</div>
-        <div style="flex:1;min-width:0">
-          <h3>6 semanas seguidas cuidando</h3>
-          <p class="muted" style="font-size:13px">Terminá las tareas de esta semana para llegar a 7.</p>
-          <div class="weeks" aria-hidden="true">${[1, 1, 1, 0, 1, 1, 1, 1].map((on, i) => `<i class="${i === 7 ? "now" : on ? "on" : ""}"></i>`).join("")}</div>
+          </div>
+          ${items.length > 3 ? moreBtn("tasks-more", ui.tasksOpen, items.length, "Ver todas") : ""}
         </div>
       </section>
 
@@ -968,7 +1192,7 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
         <div class="spaces">
           ${spaces.map((sp) => {
             const n = problemCount(computeIssues(sp));
-            return `<a class="space-card glass" href="#${sp.kind}" data-space="${sp.id}" style="text-decoration:none;color:inherit">
+            return `<a class="space-card glass" href="#${sp.kind}" data-space="${sp.id}">
               <div class="thumb">${sandboxSVG(sp, Math.min(140 / sp.w, 104 / sp.l), { mini: true })}</div>
               <div><h3>${esc(sp.name)}</h3><div class="meta"><span class="mono faint">${fmtM(sp.w)} × ${fmtM(sp.l)} m</span>${n ? `<span class="pill warn">${n}</span>` : `<span class="pill good">${icon("check", "sm")}</span>`}</div></div>
             </a>`;
@@ -976,26 +1200,24 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
         </div>
       </section>
 
-      <section class="section" aria-labelledby="sow-h">
-        <div class="section-head"><h2 id="sow-h">Sembrá en ${today.toLocaleDateString("es-AR", { month: "long" })}</h2><span class="faint" style="font-size:13px">Hemisferio ${hemi() === "south" ? "Sur" : "Norte"}</span></div>
+      ${sow.length ? `<section class="section" aria-labelledby="sow-h">
+        <div class="section-head"><h2 id="sow-h">Sembrá en ${today.toLocaleDateString("es-AR", { month: "long" })}</h2></div>
         <div class="sow">
-          ${sowNow().map((k) => `<button class="glass" data-act="sow" data-name="${esc(CATALOG[k].name)}"><span class="swatch" style="--c:${CATALOG[k].color}"></span>${CATALOG[k].name}</button>`).join("")}
+          ${sow.slice(0, 4).map((k) => `<button class="glass" data-act="sow" data-name="${esc(CATALOG[k].name)}"><span class="swatch" style="--c:${CATALOG[k].color}"></span>${CATALOG[k].name}</button>`).join("")}
+          ${sow.length > 4 ? `<button class="glass" data-act="sow-all" aria-label="Ver los ${sow.length} cultivos en el catálogo">+${sow.length - 4}</button>` : ""}
         </div>
-      </section>
+      </section>` : ""}
 
       <section class="section" aria-labelledby="wx-h">
-        <div class="section-head"><h2 id="wx-h">Clima</h2><span class="example">Pronóstico de ejemplo</span></div>
+        <div class="section-head"><h2 id="wx-h">Clima</h2><span class="example">Ejemplo</span></div>
         <div class="panel glass">
           <div class="forecast">
             ${FORECAST.map((f) => `<button class="fday ${f.alert ? "alert" : ""}" data-act="day" data-d="${f.d}" aria-label="${cap(dayLong(f.d))}: ${f.sum}, máxima ${f.hi} y mínima ${f.lo} grados${f.alert ? `, ${alertTitle(f.alert).toLowerCase()}` : ""}"><b>${f.d === 0 ? "Hoy" : dayShort(f.d)}</b>${icon(f.ic)}<span class="num">${f.hi}° / ${f.lo}°</span>${f.alert ? `<span class="tag">${f.alert}</span>` : `<span class="num">${f.rain ? `${f.rain} mm` : "Seco"}</span>`}</button>`).join("")}
           </div>
-          ${precautions().map((p) => `
-            <div class="row prec ${state.precDone[p.id] ? "task-done" : ""}">
-              <button class="check" role="checkbox" aria-checked="${!!state.precDone[p.id]}" aria-label="Marcar “${esc(p.title)}” como hecha" data-act="prec" data-id="${p.id}">${icon("check", "sm")}</button>
-              <div class="grow"><h3>${esc(p.title)}</h3><p>${esc(p.text)}</p>${p.pids.length ? `<div class="facts" style="margin-top:8px">${p.pids.map((x) => `<span class="pill" style="background:color-mix(in srgb, ${CATALOG[x].color} 16%, transparent);color:var(--ink)"><span class="swatch" style="--c:${CATALOG[x].color};width:8px;height:8px"></span>${CATALOG[x].name}</span>`).join("")}</div>` : ""}</div>
-            </div>`).join("")}
         </div>
       </section>`;
+    ui.rowsFrom = null;
+    onScroll();
   }
 
   const dayShort = (d) => cap(new Date(today.getTime() + d * DAY).toLocaleDateString("es-AR", { weekday: "short" }).replace(".", ""));
@@ -1040,37 +1262,37 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
       // every crop in a harvest space, plus soft-leaved ornamentals
       const ids = new Set();
       state.spaces.forEach((s) => s.plants.forEach((p) => { if (s.kind === "harvest" || CATALOG[p.pid].traits.includes("softLeaf")) ids.add(p.pid); }));
-      if (ids.size) out.push({ id: "hail-" + hail.d, pids: [...ids], d: hail.d,
+      if (ids.size) out.push({ id: "hail-" + hail.d, pids: [...ids], d: hail.d, short: "Cubrí la huerta del granizo",
         title: `Cubrí la huerta y las plantas delicadas con tela antigranizo o media sombra ${beforeDay(hail.d)}`,
         text: `${hail.chance}% de probabilidad de tormenta con granizo. Las hojas tiernas y los frutos se rompen con el golpe.` });
     }
     if (zonda) {
       const potted = new Set();
       state.spaces.forEach((s) => s.plants.forEach((p) => { if (p.pot) potted.add(p.pid); }));
-      out.push({ id: "zonda-" + zonda.d, pids: [...potted], d: zonda.d,
+      out.push({ id: "zonda-" + zonda.d, pids: [...potted], d: zonda.d, short: "Regá temprano y protegé las macetas",
         title: "Regá temprano y protegé del viento caliente las plantas jóvenes y las que están en maceta",
         text: `Zonda ${onDay(zonda.d)}, con hasta ${zonda.hi} °C y aire muy seco. La tierra de las macetas se seca en pocas horas.` });
     }
     if (rain) {
       const low = plantsWith("lowFruit");
-      if (low.length) out.push({ id: "rain-fruit-" + rain.d, pids: low, d: rain.d, title: `Levantá los frutos del suelo ${beforeDay(rain.d)}`,
+      if (low.length) out.push({ id: "rain-fruit-" + rain.d, pids: low, d: rain.d, short: "Levantá los frutos del suelo", title: `Levantá los frutos del suelo ${beforeDay(rain.d)}`,
         text: `Se esperan ${rain.rain} mm de lluvia. Los morrones, tomates y frutillas apoyados en tierra mojada se pueden pudrir. Poné paja abajo o atá las ramas bajas.` });
     }
     // Only when the week brings meaningful rain; it never tells the user to stop watering
     const total = FORECAST.reduce((a, f) => a + f.rain, 0);
     if (total >= 20) {
       const wettest = FORECAST.reduce((a, f) => (f.rain > a.rain ? f : a), FORECAST[0]);
-      out.push({ id: "rain-water-" + wettest.d, pids: [], d: wettest.d, title: "Regá menos esta semana",
+      out.push({ id: "rain-water-" + wettest.d, pids: [], d: wettest.d, short: "Regá menos esta semana", title: "Regá menos esta semana",
         text: `Se esperan unos ${total} mm de lluvia. Antes de regar, tocá la tierra: si está húmeda a 2 cm, esperá un día. Fijate que las macetas drenen bien.` });
     }
-    if (heat) {
+    if (heat && !heat.zonda) { // the Zonda precaution already covers heat on that day
       const hs = plantsWith("heatBolt");
-      if (hs.length) out.push({ id: "heat-" + heat.d, pids: hs, d: heat.d, title: `Protegé del calor ${onDay(heat.d)}`,
+      if (hs.length) out.push({ id: "heat-" + heat.d, pids: hs, d: heat.d, short: "Protegé del calor", title: `Protegé del calor ${onDay(heat.d)}`,
         text: `Se esperan ${heat.hi} °C. La lechuga se puede espigar y las hojas de la hortensia, quemar. Regá temprano y poné media sombra a la tarde.` });
     }
     if (frost) {
       const ft = plantsWith("frostTender");
-      if (ft.length) out.push({ id: "frost-" + frost.d, pids: ft, d: frost.d, title: `Tapá las plantas sensibles ${nightOf(frost.d)}`,
+      if (ft.length) out.push({ id: "frost-" + frost.d, pids: ft, d: frost.d, short: "Tapá las plantas sensibles", title: `Tapá las plantas sensibles ${nightOf(frost.d)}`,
         text: `Se esperan ${frost.lo} °C. Cubrilas con tela antiheladas antes de que baje el sol.` });
     }
     return out;
@@ -1080,36 +1302,39 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
     const space = currentSpace(kind);
     const title = kind === "garden" ? "Jardín" : "Cosecha";
     if (!space) {
-      view.innerHTML = `<header class="topbar"><h1>${title}</h1></header><div class="panel glass" style="padding:20px"><p class="muted">Todavía no tenés espacios.</p><button class="btn primary" data-act="space-new" data-kind="${kind}" style="margin-top:12px">${icon("plus")} Crear un espacio</button></div>`;
+      view.innerHTML = `<header class="topbar appbar"><h1>${title}</h1></header><div class="panel glass" style="padding:20px"><p class="muted">Todavía no tenés espacios.</p><button class="btn primary" data-act="space-new" data-kind="${kind}" style="margin-top:12px">${icon("plus")} Crear un espacio</button></div>`;
       return;
     }
     view.innerHTML = `
-      <header class="topbar">
+      <header class="topbar appbar">
         <div class="title-row">
           <h1>${title}</h1>
           <button class="chip-btn glass" data-act="spaces" data-kind="${kind}" aria-haspopup="dialog"><span>${esc(space.name)}</span>${icon("chev", "sm")}</button>
         </div>
       </header>
-      <div class="dims mono" id="dims"></div>
+      <div class="dims" id="dims"></div>
       <div class="sandbox-row">
         <div class="stage" id="stage"></div>
         <div class="tools glass" role="toolbar" aria-label="Herramientas del plano">
           <button class="tool primary" data-act="add" aria-label="Agregar una planta">${icon("plus")}</button>
           <button class="tool" data-act="sun" aria-label="Sol y sombras" aria-pressed="${state.showShadows}" id="sun-btn">${icon("sun")}</button>
           <button class="tool" data-act="toggle-issues" aria-pressed="${state.showIssues}" aria-label="Mostrar los problemas de las plantas" id="issues-btn">${icon("eye")}</button>
+          <button class="tool" data-act="legend" aria-expanded="false" aria-controls="legend-pop" aria-label="Referencias del plano" id="legend-btn">${icon("info")}</button>
           <button class="tool" data-act="undo" aria-label="Deshacer el último cambio" id="undo-btn">${icon("undo")}</button>
         </div>
-      </div>
-      <div class="legend" aria-label="Referencias del plano">
-        <span>${potGlyph()}En maceta</span>
-        <span><i class="lg-issue">!</i>Necesita atención, tocala</span>
-        <span><i class="lg-good"></i>Buena pareja</span>
-        <span><i class="lg-sel"></i>Seleccionada</span>
+        <div class="legend legend-pop glass" id="legend-pop" role="note" aria-label="Referencias del plano">
+          <span>${potGlyph()}En maceta</span>
+          <span><i class="lg-issue">!</i>Necesita atención, tocala</span>
+          <span><i class="lg-good"></i>Buena pareja</span>
+          <span><i class="lg-sel"></i>Seleccionada</span>
+        </div>
       </div>
       <div id="space-info"></div>
-      ${kind === "harvest" ? `<section class="section" aria-labelledby="tl-h"><div class="section-head"><h2 id="tl-h">Calendario de cosecha</h2></div><div class="panel glass tl" id="timeline"></div></section>` : ""}`;
+      ${kind === "harvest" ? `<section class="section" aria-labelledby="tl-h"><div class="section-head"><h2 id="tl-h">Calendario de cosecha</h2></div><div class="panel glass" id="timeline"></div></section>` : ""}`;
     drawSpace(kind);
-    if (pendingSearch && kind === "harvest") {
+    // The map key opens by itself once, on the first visit to a plan
+    if (!state.legendSeen && $("#tour").hidden) { state.legendSeen = true; save(); requestAnimationFrame(() => setLegend(true)); }
+    if (pendingSearch !== null && kind === "harvest") {
       const q = pendingSearch; pendingSearch = null;
       openCatalog(space);
       const inp = $("#cat-search"); inp.value = q; inp.dispatchEvent(new Event("input"));
@@ -1125,31 +1350,30 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
     const fs = freeSoil(space);
     const t = tasks().find((x) => x.space === space.id && !x.done);
     const dims = $("#dims");
-    if (dims) {
-      const wa = waterAvg(space), ph = soilPH();
-      dims.innerHTML = `<span>${fmtM(space.w)} × ${fmtM(space.l)} m</span><span>${fmt1(space.w * space.l / 1e4)} m²</span>${space.depth ? `<span>${space.depth} cm de profundidad</span>` : ""}<span>cuadrícula de ${space.cell} cm</span>${wa != null ? `<span>Agua ${fmt1(wa)}/10</span>` : ""}${ph ? `<span>pH probable ${dec(ph)} · ejemplo</span>` : ""}<span>Riego: ${irrigationOf(space) === "goteo" ? "goteo" : "manguera"}</span>`;
-    }
+    if (dims) dims.innerHTML = `<span class="mono">${fmtM(space.w)} × ${fmtM(space.l)} m</span><button class="dchip" data-act="details" aria-haspopup="dialog">${icon("sliders", "sm")}Detalles</button>`;
     const info = $("#space-info");
     info.innerHTML = `
       <div class="stats glass">
-        <div class="stat"><span class="label">Suelo libre</span><span class="value num">${fs.pct}%</span><span class="sub num">${fmt1(fs.m2)} m² libres</span></div>
-        <div class="stat water"><span class="label">${icon("drop", "sm")} Humedad</span><span class="value" aria-label="Sin datos">– – –</span><span class="sub">Conectá un sensor</span></div>
-        <button class="stat" data-act="issues"><span class="label">${icon("alert", "sm")} Problemas</span><span class="value num" style="color:${n ? "var(--warn)" : "var(--good)"}">${n}</span><span class="sub">${n ? "Tocá para revisar" : "Vecinos perfectos"}</span></button>
+        <div class="stat"><span class="label">Suelo libre</span><span class="value">${countHTML(fs.pct, "free-" + space.id, "%")}</span><span class="sub num">${fmt1(fs.m2)} m²</span></div>
+        <button class="stat" data-act="issues"><span class="label">${icon("alert", "sm")} Problemas</span><span class="value" style="color:${n ? "var(--warn)" : "var(--good)"}">${countHTML(n, "probs-" + space.id)}</span><span class="sub">${n ? "Tocá para revisar" : "Vecinos perfectos"}</span></button>
       </div>
-      ${t ? `<div class="reminder glass" style="margin-top:10px"><span class="bell">${icon("bell", "sm")}</span><p><b>${esc(t.title)}</b><br><span class="muted">${esc(t.meta)}</span></p></div>` : ""}`;
+      ${t ? `<div class="reminder glass" style="margin-top:10px"><span class="bell">${icon("bell", "sm")}</span><p><b>${esc(t.title)}</b> <span class="muted">· ${esc(t.meta.split(" · ").pop())}</span></p></div>` : ""}`;
+    runCounts(info);
     const ib = $("#issues-btn");
     if (ib) { ib.setAttribute("aria-pressed", state.showIssues); ib.innerHTML = icon("eye") + (n && !state.showIssues ? `<span class="badge">${n}</span>` : ""); }
     const sb = $("#sun-btn"); if (sb) sb.setAttribute("aria-pressed", state.showShadows);
     const ub = $("#undo-btn"); if (ub) ub.disabled = !(history[space.id] && history[space.id].length);
     const tl = $("#timeline");
     if (tl) {
-      const rows = harvestRows().filter((r) => r.sp.id === space.id);
-      tl.innerHTML = rows.length ? rows.map((r) => `
-        <div class="row">${emo(r.p.pid, "sm")}
+      const all = harvestRows().filter((r) => r.sp.id === space.id);
+      const rows = ui.tlOpen ? all : all.slice(0, 3);
+      tl.innerHTML = rows.length ? `<div class="tl stg">${rows.map((r, i) => `
+        <div class="row${rowIn(i)}">${emo(r.p.pid, "sm")}
           <div class="grow"><div style="display:flex;justify-content:space-between;gap:8px"><h3>${r.c.name}</h3><span class="mono ${r.left <= 0 ? "" : "faint"}" style="${r.left <= 0 ? "color:var(--soil);font-weight:500" : ""}">${r.left <= 0 ? `List${gx(r.p.pid)}` : `${r.left} días`}</span></div>
           <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(r.pct * 100)}" aria-label="Crecimiento de ${the(r.p.pid)}"><i class="${r.left <= 0 ? "ready" : ""}" style="width:${Math.round(r.pct * 100)}%"></i></div>
-          <p class="mono faint" style="margin-top:4px">Día ${r.age} de ${r.c.days[0]}–${r.c.days[1]}</p></div></div>`).join("")
+          <p class="mono faint" style="margin-top:4px">Día ${r.age} de ${r.c.days[0]}–${r.c.days[1]}</p></div></div>`).join("")}</div>${all.length > 3 ? moreBtn("tl-more", ui.tlOpen, all.length, "Ver todo") : ""}`
         : `<p class="muted" style="padding:12px">Agregá cultivos con fecha de siembra para ver cuándo están listos.</p>`;
+      ui.rowsFrom = null;
     }
     if (!o.keepSheet && selected) refreshPlantIssues(space);
   }
@@ -1186,95 +1410,141 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
     ].map((c) => ({ ...c, tier: c.tiers.filter((t) => c.v >= t).length }));
     const earned = chains.reduce((a, c) => a + c.tier, 0);
     const all = Object.keys(CATALOG);
-    const rar = (r) => r >= 8 ? `<span class="pill crit">Rara</span>` : r >= 3 ? `<span class="pill warn">Poco común</span>` : `<span class="pill plain">Común</span>`;
+    // Achievements: chains closest to their next tier first, finished chains last
+    chains.forEach((c) => { const nx = c.tiers[c.tier], pv = c.tier ? c.tiers[c.tier - 1] : 0; c.next = nx; c.pct = nx ? clamp((c.v - pv) / (nx - pv), 0, 1) : 1; });
+    const ordered = [...chains].sort((a, b) => (!a.next - !b.next) || b.pct - a.pct);
+    const shownAch = ui.achOpen ? ordered : ordered.slice(0, 3);
+    const plusDeal = chains.find((c) => c.plus && c.tier);
+    profileData = { chains, ids, all, plusDeal };
     view.innerHTML = `
-      <header class="me">
-        <div class="avatar">${icon("sprout")}</div>
+      <header class="me appbar">
+        <div class="avatar hide-stuck">${icon("sprout")}</div>
         <div style="flex:1;min-width:0">
           <h1>${LEVELS[li][1]}</h1>
-          <p class="muted">Nivel ${li + 1}${next ? ` · te faltan ${next[0] - pts} puntos para ${next[1]}` : ""}</p>
-          <div class="level bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct * 100)}" aria-label="Progreso de nivel"><i style="width:${Math.round(pct * 100)}%"></i></div>
+          <p class="stats-line hide-stuck"><span><b>${countHTML(ids.length, "species")}</b> especies</span><span><b>${countHTML(pts, "pts")}</b> puntos</span><span><b>${countHTML(6, "weeks")}</b> semanas</span></p>
         </div>
+        <button class="icon-btn glass" data-act="settings" aria-label="Ajustes" aria-haspopup="dialog">${icon("sliders")}</button>
       </header>
-
-      <div class="trio glass">
-        <div><b class="num">${ids.length}</b><span>Especies</span></div>
-        <div><b class="num">${pts}</b><span>Biodiversidad</span></div>
-        <div><b class="num">6</b><span>Semanas seguidas</span></div>
+      <div class="level">
+        <p class="muted" style="font-size:13px">Nivel ${li + 1}${next ? ` · faltan ${countHTML(next[0] - pts, "need")} puntos para ${next[1]}` : ""}</p>
+        <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct * 100)}" aria-label="Progreso de nivel"><i style="width:${Math.round(pct * 100)}%"></i></div>
       </div>
 
-      <section class="plus glass" aria-labelledby="plus-h">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h2 id="plus-h">Saphi Plus</h2><span class="pill good">Gratis durante la beta</span></div>
-        <p class="muted" style="font-size:14px">Espacios ilimitados, análisis del estudio de sol y alertas de clima. Los logros Plus te descuentan 20% del mes siguiente, de forma automática.</p>
-        <div class="row" style="padding:10px 0 0;border-top:1px solid var(--line);border-radius:0">
-          <div class="grow"><h3>Próximo mes, después de la beta</h3><p>${(() => { const e = chains.find((c) => c.plus && c.tier); return e ? `Ganaste ${e.name} ${ROMAN[e.tier]} este mes` : "Ganá un logro Plus para tener 20% de descuento"; })()}</p></div>
-          <div class="price">${chains.some((c) => c.plus && c.tier) ? `<s>US$5</s><b class="num">US$4</b>` : `<b class="num">US$5</b>`}</div>
-        </div>
-        <span class="example">Precio de ejemplo</span>
-      </section>
+      <button class="plus-row glass" data-act="plus" aria-haspopup="dialog">
+        <div class="grow"><h3 style="display:flex;gap:8px;align-items:center">Saphi Plus<span class="pill good">Gratis en la beta</span></h3><p class="muted" style="font-size:13px">${plusDeal ? "Ganaste 20% para el próximo mes" : "Los logros Plus te dan 20% de descuento"}</p></div>
+        ${icon("chev", "sm rot")}
+      </button>
 
       <section class="section" aria-labelledby="ach-h">
-        <div class="section-head"><h2 id="ach-h">Logros</h2><span class="faint num">${earned}/${chains.length * 3} niveles</span></div>
+        <div class="section-head"><h2 id="ach-h">Logros</h2><span class="faint num">${earned}/${chains.length * 3}</span></div>
         <div class="panel glass">
-          ${chains.map((c) => {
-            const next = c.tiers[c.tier];
-            const prev = c.tier ? c.tiers[c.tier - 1] : 0;
-            const pct = next ? clamp((c.v - prev) / (next - prev), 0, 1) : 1;
-            return `<div class="row ach ${c.tier ? "" : "locked"}">
+          <div class="stg">
+          ${shownAch.map((c, i) => `<div class="row ach ${c.tier ? "" : "locked"}${rowIn(i)}">
               <span class="medal tier">${icon(c.tier ? c.ic : "lock")}${c.tier ? `<span class="num-badge">${ROMAN[c.tier]}</span>` : ""}</span>
               <div class="grow">
-                <div style="display:flex;justify-content:space-between;gap:8px"><h3 style="display:flex;gap:6px;align-items:center">${c.name}${c.tier ? ` ${ROMAN[c.tier]}` : ""}${c.plus ? `<span class="pill plusp">Plus</span>` : ""}</h3><span class="mono faint num">${next ? `${c.v}/${next}` : "Listo"}</span></div>
-                <p>${next ? `Te faltan ${next - c.v} ${c.unit} para el nivel ${ROMAN[c.tier + 1]}` : `Todos los niveles completos · ${c.v} ${c.unit}`}</p>
-                <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct * 100)}" aria-label="Progreso de ${c.name}"><i style="width:${Math.round(pct * 100)}%"></i></div>
-                ${c.plus ? `<span class="reward">${icon("basket", "sm")}Cada nivel nuevo: 20% de descuento en tu próximo mes de Plus</span>` : c.reward ? `<span class="reward">${icon("basket", "sm")}Premio del nivel III: ${c.reward}</span>` : ""}
+                <div style="display:flex;justify-content:space-between;gap:8px"><h3 style="display:flex;gap:6px;align-items:center">${c.name}${c.tier ? ` ${ROMAN[c.tier]}` : ""}${c.plus ? `<span class="pill plusp">Plus</span>` : ""}</h3><span class="mono faint num">${c.next ? `${c.v}/${c.next}` : "Listo"}</span></div>
+                <p>${c.next ? `Faltan ${c.next - c.v} ${c.unit}` : `Completo · ${c.v} ${c.unit}`}</p>
+                <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(c.pct * 100)}" aria-label="Progreso de ${c.name}"><i style="width:${Math.round(c.pct * 100)}%"></i></div>
+                ${c.plus ? `<span class="reward">${icon("basket", "sm")}Cada nivel: 20% en tu próximo mes de Plus</span>` : c.reward ? `<span class="reward">${icon("basket", "sm")}Nivel III: ${c.reward}</span>` : ""}
               </div>
-            </div>`;
-          }).join("")}
+            </div>`).join("")}
+          </div>
+          ${moreBtn("ach-more", ui.achOpen, chains.length, "Ver todos")}
         </div>
-        <p class="faint" style="font-size:12px">Los premios están pensados para después de la beta y acá se muestran como ejemplo.</p>
+        <p class="faint" style="font-size:12px">Premios de ejemplo, pensados para después de la beta.</p>
       </section>
 
       <section class="section" aria-labelledby="herb-h">
-        <div class="section-head"><h2 id="herb-h">Colección de plantas</h2><span class="faint num">${ids.length}/${all.length}</span></div>
-        <p class="muted" style="font-size:14px">Cada especie que plantás se suma a tu colección. Las especies raras suman más puntos de biodiversidad.</p>
-        <div class="herb">
-          ${all.sort((a, b) => (ids.includes(b) - ids.includes(a)) || CATALOG[b].rarity - CATALOG[a].rarity).map((pid) => {
-            const c = CATALOG[pid], has = ids.includes(pid);
-            return `<button class="glass ${has ? "" : "undisc"}" data-act="herb" data-pid="${pid}" style="--c:${c.color}">
-<span class="leafmark">${icon(has ? (c.kind === "harvest" ? "sprout" : "leaf") : "lock")}</span>
-              <div><h3>${has ? c.name : "Sin descubrir"}</h3><p class="sci">${has ? c.sci : c.family}</p></div>
-              <div class="facts" style="gap:4px">${has ? rar(c.rarity) : `<span class="pill plain">${c.rarity * 10} pts</span>`}${c.native ? `<span class="pill good">Nativa</span>` : ""}</div>
-            </button>`;
+        <div class="section-head"><h2 id="herb-h">Colección</h2><span class="faint num">${ids.length}/${all.length}</span></div>
+        <div class="coll">
+          ${[...ids].sort((a, b) => CATALOG[b].rarity - CATALOG[a].rarity).map((pid) => {
+            const c = CATALOG[pid];
+            return `<button class="glass" data-act="herb" data-pid="${pid}" style="--c:${c.color}">${c.kind === "harvest" ? emo(pid, "sm") : `<span class="leafmark" style="width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb, var(--c) 18%, transparent);color:var(--c)">${icon("leaf", "sm")}</span>`}<h3>${c.name}</h3>${rar(c.rarity)}</button>`;
           }).join("")}
         </div>
-      </section>
-
-      <section class="section" aria-labelledby="set-h">
-        <div class="section-head"><h2 id="set-h">Ajustes</h2></div>
-        <div class="panel glass">
-          <div class="setting">
-            <div class="between"><h3>Tema</h3><span class="faint" style="font-size:13px">${state.mode === "auto" ? `Ahora ${resolvedMode() === "day" ? "de día" : "de noche"}, según tu hora local` : ""}</span></div>
-            <div class="seg glass" role="group" aria-label="Tema">
-              ${[["auto", "Automático", "auto"], ["day", "Día", "sun"], ["night", "Noche", "moon"]].map(([v, l, ic]) => `<button data-act="mode" data-mode="${v}" aria-pressed="${state.mode === v}">${icon(ic, "sm")}${l}</button>`).join("")}
-            </div>
-          </div>
-          <div class="setting">
-            <div class="between"><h3>Ubicación</h3><span class="faint" style="font-size:13px">Para el sol, la sombra y el clima</span></div>
-            <p class="muted" style="font-size:14px">${locSummary()}</p>
-            ${locationHTML()}
-          </div>
-          <div class="setting">
-            <div class="between"><h3>Hemisferio</h3><span class="faint" style="font-size:13px">${state.location ? "Lo define tu ubicación" : "Si preferís no compartir tu ubicación"}</span></div>
-            <div class="seg glass" role="group" aria-label="Hemisferio" style="grid-template-columns:1fr 1fr">
-              ${[["south", "Sur"], ["north", "Norte"]].map(([v, l]) => `<button data-act="hemi" data-v="${v}" aria-pressed="${hemi() === v}" ${state.location ? "disabled" : ""}>${l}</button>`).join("")}
-            </div>
-          </div>
-          <div class="setting"><div class="between"><h3>Unidades</h3><span class="muted">Métrico (cm, m)</span></div></div>
-          <div class="setting"><div class="between"><h3>Cómo funciona Saphi</h3><button class="btn" data-act="tour-open">Ver el tutorial</button></div></div>
-          <div class="setting"><div class="between"><h3>Tus datos</h3><span class="muted" style="font-size:13px;text-align:right">En el prototipo quedan en este dispositivo</span></div>
-            <button class="btn danger" data-act="reset" style="align-self:flex-start">Restablecer datos de ejemplo</button></div>
-        </div>
+        <button class="btn" data-act="collection" aria-haspopup="dialog" style="align-self:flex-start">Ver colección (${ids.length}/${all.length})</button>
       </section>`;
+    ui.rowsFrom = null;
+    runCounts(view); onScroll();
+  }
+  let profileData = null;
+  const rar = (r) => r >= 8 ? `<span class="pill crit">Rara</span>` : r >= 3 ? `<span class="pill warn">Poco común</span>` : `<span class="pill plain">Común</span>`;
+
+  function openPlus() {
+    const deal = profileData && profileData.plusDeal;
+    openSheet(`
+      <div class="sh-head"><div class="grow"><h2>Saphi Plus</h2><p class="muted">Gratis durante la beta</p></div><button class="icon-btn" data-act="close" aria-label="Cerrar">${icon("x")}</button></div>
+      <p class="muted">Espacios ilimitados, análisis del estudio de sol y alertas de clima. Cada logro Plus te descuenta 20% del mes siguiente.</p>
+      <div class="panel glass"><div class="row"><div class="grow"><h3>Próximo mes, después de la beta</h3><p>${deal ? `Ganaste ${deal.name} ${["", "I", "II", "III"][deal.tier]}` : "Ganá un logro Plus para tener 20% de descuento"}</p></div>
+        <div class="plus" style="padding:0"><div class="price">${deal ? `<s>US$5</s><b class="num">US$4</b>` : `<b class="num">US$5</b>`}</div></div></div></div>
+      <span class="example">Precio de ejemplo</span>`);
+  }
+
+  function openCollection() {
+    const { ids, all } = profileData || { ids: discovered(), all: Object.keys(CATALOG) };
+    openSheet(`
+      <div class="sh-head"><div class="grow"><h2>Colección de plantas</h2><p class="muted">${ids.length} de ${all.length}. Las raras suman más puntos.</p></div><button class="icon-btn" data-act="close" aria-label="Cerrar">${icon("x")}</button></div>
+      <div class="herb">
+        ${[...all].sort((a, b) => (ids.includes(b) - ids.includes(a)) || CATALOG[b].rarity - CATALOG[a].rarity).map((pid) => {
+          const c = CATALOG[pid], has = ids.includes(pid);
+          return `<button class="glass ${has ? "" : "undisc"}" data-act="herb" data-pid="${pid}" style="--c:${c.color}">
+            <span class="leafmark">${icon(has ? (c.kind === "harvest" ? "sprout" : "leaf") : "lock")}</span>
+            <div><h3>${has ? c.name : "Sin descubrir"}</h3><p class="sci">${has ? c.sci : c.family}</p></div>
+            <div class="facts" style="gap:4px">${has ? rar(c.rarity) : `<span class="pill plain">${c.rarity * 10} pts</span>`}${c.native ? `<span class="pill good">Nativa</span>` : ""}</div>
+          </button>`;
+        }).join("")}
+      </div>`);
+  }
+
+  function openSettings() {
+    openSheet(`
+      <div class="sh-head"><div class="grow"><h2>Ajustes</h2></div><button class="icon-btn" data-act="close" aria-label="Cerrar">${icon("x")}</button></div>
+      <div class="panel glass">
+        <div class="setting">
+          <div class="between"><h3>Tema</h3><span class="faint" style="font-size:13px">${state.mode === "auto" ? `Ahora ${resolvedMode() === "day" ? "de día" : "de noche"}, según tu hora` : ""}</span></div>
+          <div class="seg glass" role="group" aria-label="Tema">
+            ${[["auto", "Auto", "auto"], ["day", "Día", "sun"], ["night", "Noche", "moon"]].map(([v, l, ic]) => `<button data-act="mode" data-mode="${v}" aria-pressed="${state.mode === v}">${icon(ic, "sm")}${l}</button>`).join("")}
+          </div>
+        </div>
+        <div class="setting">
+          <div class="between"><h3>Ubicación</h3><span class="faint" style="font-size:13px">Sol, sombra y clima</span></div>
+          <p class="muted" style="font-size:14px">${locSummary()}</p>
+          ${locationHTML()}
+        </div>
+        <div class="setting">
+          <div class="between"><h3>Hemisferio</h3><span class="faint" style="font-size:13px">${state.location ? "Lo define tu ubicación" : "Sin ubicación"}</span></div>
+          <div class="seg glass" role="group" aria-label="Hemisferio" style="grid-template-columns:1fr 1fr">
+            ${[["south", "Sur"], ["north", "Norte"]].map(([v, l]) => `<button data-act="hemi" data-v="${v}" aria-pressed="${hemi() === v}" ${state.location ? "disabled" : ""}>${l}</button>`).join("")}
+          </div>
+        </div>
+        <div class="setting"><div class="between"><h3>Unidades</h3><span class="muted">Métrico (cm, m)</span></div></div>
+        <div class="setting"><div class="between"><h3>Cómo funciona</h3><button class="btn" data-act="tour-open">Ver el tutorial</button></div></div>
+        <div class="setting"><div class="between"><h3>Tus datos</h3><span class="muted" style="font-size:13px;text-align:right">Quedan en este dispositivo</span></div>
+          <button class="btn danger" data-act="reset" style="align-self:flex-start">Restablecer datos de ejemplo</button></div>
+      </div>`);
+    sheetKind = { type: "settings" };
+  }
+
+  // Space details: everything the dims row used to show, plus irrigation and the moisture sensor
+  function openDetails(space) {
+    const wa = waterAvg(space), ph = soilPH();
+    openSheet(`
+      <div class="sh-head"><div class="grow"><h2>${esc(space.name)}</h2><p class="muted">Detalles del espacio</p></div><button class="icon-btn" data-act="close" aria-label="Cerrar">${icon("x")}</button></div>
+      <div class="panel glass">
+        <div class="kv"><span>Superficie</span><span class="mono">${fmtM(space.w)} × ${fmtM(space.l)} m · ${fmt1(space.w * space.l / 1e4)} m²</span></div>
+        <div class="kv"><span>Profundidad</span><span class="mono">${space.depth ? `${space.depth} cm` : "Sin dato"}</span></div>
+        <div class="kv"><span>Cuadrícula</span><span class="mono">${space.cell} cm</span></div>
+        <div class="kv"><span>Agua promedio</span><span class="mono">${wa != null ? `${fmt1(wa)}/10` : "Sin plantas"}</span></div>
+        ${ph ? `<div class="kv"><span>pH probable</span><span class="mono">${dec(ph)} <span class="example">ejemplo</span></span></div>` : ""}
+      </div>
+      <div class="section">
+        <h3>Riego</h3>
+        <div class="seg glass" role="group" aria-label="Riego de ${esc(space.name)}" style="grid-template-columns:1fr 1fr">
+          ${[["manguera", "Manguera"], ["goteo", "Goteo"]].map(([v, l]) => `<button data-act="irrigation" data-v="${v}" aria-pressed="${irrigationOf(space) === v}">${icon("drop", "sm")}${l}</button>`).join("")}
+        </div>
+      </div>
+      <div class="reminder glass"><span class="bell">${icon("drop", "sm")}</span><p><b>Sensor de humedad</b><br><span class="muted">Sin conectar. Con un sensor ves la humedad real del suelo.</span></p></div>`);
+    sheetKind = { type: "details", space };
   }
 
   /* ---------- Sheet ---------- */
@@ -1282,8 +1552,11 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
   let onSheetClose = null, lastFocus = null;
   function openSheet(html, onClose) {
     sheetKind = null;
-    if (!sheet.classList.contains("open")) lastFocus = document.activeElement;
+    const wasOpen = sheet.classList.contains("open");
+    if (!wasOpen) lastFocus = document.activeElement;
     sheetBody.innerHTML = html;
+    // follow-through only when the sheet slides in, not when its content is refreshed in place
+    if (!wasOpen) { sheetBody.classList.add("enter"); clearTimeout(openSheet.t); openSheet.t = setTimeout(() => sheetBody.classList.remove("enter"), 450); }
     scrim.hidden = false; requestAnimationFrame(() => scrim.classList.add("show"));
     sheet.classList.add("open"); sheet.setAttribute("aria-hidden", "false");
     onSheetClose = onClose || null;
@@ -1293,17 +1566,36 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
   function closeSheet(silent) {
     if (!sheet.classList.contains("open")) return;
     sheet.classList.remove("open"); sheet.setAttribute("aria-hidden", "true");
-    scrim.classList.remove("show"); setTimeout(() => { if (!sheet.classList.contains("open")) scrim.hidden = true; }, 300);
+    scrim.classList.remove("show"); setTimeout(() => { if (!sheet.classList.contains("open")) scrim.hidden = true; }, 160);
     const cb = onSheetClose; onSheetClose = null;
     if (cb && !silent) cb();
     if (lastFocus && document.contains(lastFocus) && !silent) lastFocus.focus({ preventScroll: true });
   }
   scrim.addEventListener("click", () => closeSheet());
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSheet(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closeSheet(); setLegend(false); } });
+
+  /* Map key popover: grows from its trigger button */
+  function setLegend(on) {
+    const pop = $("#legend-pop"), btn = $("#legend-btn"); if (!pop || !btn) return;
+    if (on) {
+      const row = pop.parentElement.getBoundingClientRect(), br = btn.getBoundingClientRect();
+      const top = Math.max(0, br.top - row.top - 8);
+      pop.style.top = top + "px";
+      pop.style.transformOrigin = `100% ${br.top - row.top - top + br.height / 2}px`;
+    }
+    pop.classList.toggle("open", on); btn.setAttribute("aria-expanded", on);
+  }
+  document.addEventListener("pointerdown", (e) => {
+    const pop = $("#legend-pop");
+    if (pop && pop.classList.contains("open") && !e.target.closest("#legend-pop, #legend-btn")) setLegend(false);
+  });
 
   const SUN = { full: "Sol pleno", partial: "Media sombra", shade: "Sombra" };
   // Plant facts shared by the plant sheet and the collection sheet
   const factsHTML = (c) => `<span class="fact">${icon("sun", "sm")}${SUN[c.sun]}</span><span class="fact">${icon("drop", "sm")}Agua ${c.water}/10</span><span class="fact mono">pH ${dec(c.ph[0])}–${dec(c.ph[1])}</span><span class="fact">${c.life}</span>${c.native ? `<span class="fact" style="color:var(--good);background:var(--good-bg)">Nativa</span>` : ""}${c.invasive ? `<span class="fact" style="color:var(--crit)">Se expande</span>` : ""}${c.invasiveAR ? `<span class="fact" style="color:var(--crit);background:var(--crit-bg)">Invasora en Argentina</span>` : ""}`;
+
+  // The plant sheet shows only the three facts that drive placement
+  const keyFactsHTML = (c) => `<span class="fact">${icon("sun", "sm")}${SUN[c.sun]}</span><span class="fact">${icon("drop", "sm")}Agua ${c.water}/10</span><span class="fact mono">pH ${dec(c.ph[0])}–${dec(c.ph[1])}</span>`;
 
   function issueHTML(it, space, withJump) {
     const ic = it.sev === "good" ? "sprout" : "alert";
@@ -1330,22 +1622,27 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
     const sl = (key, label, min, max) => `<div class="slider"><label for="sl-${key}">${label}</label><input type="range" id="sl-${key}" min="${min}" max="${max}" step="5" value="${p[key]}" data-key="${key}"><output class="mono num" id="out-${key}">${p[key]} cm</output></div>`;
     openSheet(`
       <div class="sh-head">${c.kind === "harvest" ? emo(p.pid) : `<span class="swatch" style="--c:${c.color}"></span>`}<div class="grow"><h2>${c.name}${p.count ? ` <span class="faint mono">×${p.count}</span>` : ""}</h2><p class="sci">${c.sci}</p></div><button class="icon-btn" data-act="close" aria-label="Cerrar">${icon("x")}</button></div>
-      <div class="facts">${factsHTML(c)}</div>
-      <div class="section"><div class="section-head" style="margin:0"><h3>Tamaño adulto</h3><span class="faint" style="font-size:12px">Catálogo: ${c.sx} × ${c.sy} × ${c.h} cm</span></div>
-        ${sl("sx", "Ancho", 10, Math.max(400, c.sx * 2))}${sl("sy", "Largo", 10, Math.max(400, c.sy * 2))}${sl("h", "Alto", 10, Math.max(500, c.h * 2))}
-      </div>
+      <div class="facts">${keyFactsHTML(c)}</div>
+      <div class="issues" id="plant-issues" aria-label="Vecinos y suelo"></div>
       <div class="section">
-        <h3>Dónde está plantada</h3>
-        <div class="seg glass" role="group" aria-label="Dónde está plantada" style="grid-template-columns:1fr 1fr">
-          <button data-act="pot-mode" data-v="ground" aria-pressed="${!p.pot}">En la tierra</button>
-          <button data-act="pot-mode" data-v="pot" aria-pressed="${!!p.pot}">${potGlyph()}En maceta</button>
+        <div class="plant-in"><h3>Plantada en</h3>
+          <div class="seg glass" role="group" aria-label="Plantada en" style="grid-template-columns:1fr 1fr">
+            <button data-act="pot-mode" data-v="ground" aria-pressed="${!p.pot}">Suelo</button>
+            <button data-act="pot-mode" data-v="pot" aria-pressed="${!!p.pot}">${potGlyph()}Maceta</button>
+          </div>
         </div>
-        ${p.pot ? `${sl("pot", "Maceta Ø", 15, 120)}<p class="muted" style="font-size:13px">La maceta separa raíces y tierra: no se escapan estolones y tiene su propio pH. ${p.pot < Math.min(p.sx, p.sy) * 0.4 ? `<b style="color:var(--warn)">Esta maceta parece chica para una planta de ${p.sx} cm.</b>` : ""}</p>` : ""}
+        ${p.pot ? `${sl("pot", "Maceta Ø", 15, 120)}${p.pot < Math.min(p.sx, p.sy) * 0.4 ? `<p style="font-size:13px;color:var(--warn)">Parece chica para una planta de ${p.sx} cm.</p>` : ""}` : ""}
       </div>
-      <div class="section"><h3>Vecinos y suelo</h3><div class="issues" id="plant-issues"></div></div>
+      <div class="disc${ui.sizeOpen ? " open" : ""}" id="size-disc">
+        <button class="disc-btn" data-act="size-toggle" aria-expanded="${ui.sizeOpen}" aria-controls="size-body">Ajustar tamaño${icon("chev", "sm")}</button>
+        <div class="disc-body" id="size-body"><div>
+          <p class="faint" style="font-size:12px">Adulta según catálogo: ${c.sx} × ${c.sy} × ${c.h} cm</p>
+          ${sl("sx", "Ancho", 10, Math.max(400, c.sx * 2))}${sl("sy", "Largo", 10, Math.max(400, c.sy * 2))}${sl("h", "Alto", 10, Math.max(500, c.h * 2))}
+        </div></div>
+      </div>
       <div class="actions">
-        <button class="btn" data-act="dup">${icon("copy", "sm")}Duplicar</button>
-        <button class="btn danger" data-act="remove">${icon("trash", "sm")}Quitar</button>
+        <button class="btn icon" data-act="dup" aria-label="Duplicar ${esc(the(p.pid))}">${icon("copy")}</button>
+        <button class="btn icon danger" data-act="remove" aria-label="Quitar ${esc(the(p.pid))}">${icon("trash")}</button>
         <button class="btn primary" data-act="close">Listo</button>
       </div>`, () => { selected = null; drawSpace(space.kind, { keepSheet: true }); });
     refreshPlantIssues(space);
@@ -1449,6 +1746,7 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
   function setLocation(loc) {
     state.location = loc; save();
     if (sheetKind && sheetKind.type === "sun" && sheet.classList.contains("open")) { openSun(sheetKind.space); drawSpace(sheetKind.space.kind, { keepSheet: true }); }
+    else if (sheetKind && sheetKind.type === "settings" && sheet.classList.contains("open")) { renderProfile(); openSettings(); }
     else render();
     toast(loc ? `Ubicación: ${loc.name}` : "Quitaste la ubicación");
   }
@@ -1466,12 +1764,6 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
       <div class="panel glass" role="radiogroup" aria-label="Espacios">
         ${list.map((s) => `<button class="row radio-row" role="radio" aria-checked="${cur && s.id === cur.id}" data-act="pick-space" data-id="${s.id}"><span class="radio-dot"></span><div class="grow"><h3>${esc(s.name)}</h3><p class="mono">${fmtM(s.w)} × ${fmtM(s.l)} m · ${s.plants.length} ${s.plants.length === 1 ? "planta" : "plantas"}</p></div></button>`).join("")}
       </div>
-      ${cur && !showForm ? `<div class="section">
-        <div class="between" style="display:flex;justify-content:space-between;align-items:baseline;gap:12px"><h3>Riego</h3><span class="faint" style="font-size:13px">${esc(cur.name)}</span></div>
-        <div class="seg glass" role="group" aria-label="Riego de ${esc(cur.name)}" style="grid-template-columns:1fr 1fr">
-          ${[["manguera", "Manguera"], ["goteo", "Goteo"]].map(([v, l]) => `<button data-act="irrigation" data-v="${v}" aria-pressed="${irrigationOf(cur) === v}">${icon("drop", "sm")}${l}</button>`).join("")}
-        </div>
-      </div>` : ""}
       <form class="section" id="space-form" novalidate ${showForm ? "" : "hidden"}>
         <h3>Espacio nuevo</h3>
         <div class="form">
@@ -1534,12 +1826,25 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
       }
       case "sun": openSun(space); break;
       case "day": openDay(+b.dataset.d); break;
-      case "sow": pendingSearch = b.dataset.name; state.current.harvest = state.current.harvest || "bed"; save();
+      case "sow": case "sow-all": pendingSearch = act === "sow" ? b.dataset.name : ""; state.current.harvest = state.current.harvest || "bed"; save();
         if (route() === "harvest") { render(); } else location.hash = "harvest"; break;
-      case "tour-next": tourStep++; drawTour(); break;
-      case "tour-back": tourStep = Math.max(0, tourStep - 1); drawTour(); break;
+      case "tour-next": tourStep++; tourDir = 1; drawTour(); break;
+      case "tour-back": tourStep = Math.max(0, tourStep - 1); tourDir = -1; drawTour(); break;
       case "tour-end": endTour(); break;
-      case "tour-open": tourStep = 0; drawTour(); break;
+      case "tour-open": closeSheet(true); tourStep = 0; tourDir = 0; drawTour(); break;
+      case "details": openDetails(space); break;
+      case "legend": setLegend(!$("#legend-pop").classList.contains("open")); break;
+      case "tasks-more": ui.tasksOpen = !ui.tasksOpen; ui.rowsFrom = ui.tasksOpen ? 3 : null; renderHome(); break;
+      case "tl-more": ui.tlOpen = !ui.tlOpen; ui.rowsFrom = ui.tlOpen ? 3 : null; drawSpace(r, { keepSheet: true }); break;
+      case "ach-more": ui.achOpen = !ui.achOpen; ui.rowsFrom = ui.achOpen ? 3 : null; renderProfile(); break;
+      case "size-toggle": {
+        ui.sizeOpen = !ui.sizeOpen;
+        $("#size-disc").classList.toggle("open", ui.sizeOpen); b.setAttribute("aria-expanded", ui.sizeOpen);
+        break;
+      }
+      case "settings": openSettings(); break;
+      case "plus": openPlus(); break;
+      case "collection": openCollection(); break;
       case "pot-mode": setPot(space, selected, b.dataset.v === "pot"); openPlant(space, selected); break;
       case "pot-on": {
         const kind = sheetKind && sheetKind.type;
@@ -1560,11 +1865,7 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
         } catch (err) { fail(); }
         break;
       }
-      case "prec": {
-        state.precDone[b.dataset.id] = !state.precDone[b.dataset.id]; save(); renderHome();
-        const again = document.querySelector(`[data-act="prec"][data-id="${b.dataset.id}"]`); if (again) again.focus({ preventScroll: true });
-        break;
-      }
+      case "prec": case "task": toggleTodo(act, b.dataset.id); break;
       case "toggle-issues": state.showIssues = !state.showIssues; save(); drawSpace(r, { keepSheet: true }); break;
       case "undo": undo(space); break;
       case "issues": openIssues(space); break;
@@ -1589,23 +1890,14 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
       case "irrigation": {
         if (!space) break;
         space.irrigation = b.dataset.v === "goteo" ? "goteo" : "manguera"; save();
-        openSpaces(r, false); drawSpace(r, { keepSheet: true });
+        openDetails(space); drawSpace(r, { keepSheet: true });
         toast(space.irrigation === "goteo" ? `${space.name}: riego por goteo` : `${space.name}: riego con manguera`);
         break;
       }
       case "space-new": openSpaces(b.dataset.kind, true); break;
       case "pick-space": state.current[r] = b.dataset.id; save(); closeSheet(true); renderSpace(r); break;
-      case "task": {
-        const key = today.toISOString().slice(0, 10);
-        const day = (state.tasksDone[key] = state.tasksDone[key] || {});
-        day[b.dataset.id] = !day[b.dataset.id]; save(); renderHome();
-        const again = document.querySelector(`[data-act="task"][data-id="${b.dataset.id}"]`); if (again) again.focus({ preventScroll: true });
-        break;
-      }
-      case "cycle-mode": state.mode = state.mode === "auto" ? (resolvedMode() === "day" ? "night" : "day") : "auto"; save(); applyMode(); renderHome();
-        toast(state.mode === "auto" ? "El tema sigue tu hora local" : `Tema de ${state.mode === "day" ? "día" : "noche"} activado`); break;
-      case "mode": state.mode = b.dataset.mode; save(); applyMode(); renderProfile(); break;
-      case "hemi": state.hemisphere = b.dataset.v; save(); renderProfile(); toast("Avisos de sombra actualizados"); break;
+      case "mode": state.mode = b.dataset.mode; save(); applyMode(); renderProfile(); openSettings(); break;
+      case "hemi": state.hemisphere = b.dataset.v; save(); renderProfile(); openSettings(); toast("Avisos de sombra actualizados"); break;
       case "herb": {
         const c = CATALOG[b.dataset.pid]; const ids = discovered();
         if (!ids.includes(b.dataset.pid)) { toast(`Plantá esta especie de la familia ${c.family} para descubrirla`); break; }
@@ -1620,7 +1912,7 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
   });
 
   /* ---------- Tutorial ---------- */
-  let tourStep = 0;
+  let tourStep = 0, tourDir = 0; // tourDir: 1 next (enters from the right), -1 back (from the left), 0 first open
   const big = (id) => `<span style="width:72px;height:72px;border-radius:50%;display:grid;place-items:center;background:var(--forest);color:var(--forest-ink)"><svg class="ic" style="width:34px;height:34px"><use href="#i-${id}"/></svg></span>`;
   const TOUR = [
     { t: "Te damos la bienvenida a Saphi", p: "Planificá tu jardín y tu huerta a escala, mirá qué plantas se llevan bien y mantenelas vivas con recordatorios.", v: () => big("sprout") },
@@ -1639,14 +1931,18 @@ select.input { height: 44px; border-radius: 12px; border: 1px solid var(--line);
     const el = $("#tour");
     if (tourStep >= TOUR.length) { endTour(true); return; }
     const s = TOUR[tourStep], last = tourStep === TOUR.length - 1;
-    el.innerHTML = `<div class="tour-card">
-      <div class="tour-visual">${s.v()}</div>
-      <div class="dots" aria-hidden="true">${TOUR.map((_, i) => `<i class="${i === tourStep ? "on" : ""}"></i>`).join("")}</div>
-      <div><h2 id="tour-title">${s.t}</h2><p style="margin-top:6px">${s.p}</p></div>
+    const first = el.hidden;
+    // Blur Text: each word of the step title blurs in, 40ms apart
+    const words = s.t.split(" ").map((w, i) => `<span class="w" style="--i:${i}">${w}</span>`).join(" ");
+    el.innerHTML = `<div class="tour-card${first ? " first" : ""}">
+      <div class="tour-slide${tourDir > 0 ? " from-r" : tourDir < 0 ? " from-l" : ""}">
+        <div class="tour-visual">${s.v()}</div>
+        <div><h2 id="tour-title" aria-label="${esc(s.t)}"><span aria-hidden="true">${words}</span></h2><p style="margin-top:6px">${s.p}</p></div>
+      </div>
       <div class="tour-nav">
         ${tourStep ? `<button class="btn" data-act="tour-back">Atrás</button>` : `<button class="btn" data-act="tour-end">Saltar</button>`}
-        <span class="faint mono num">${tourStep + 1} / ${TOUR.length}</span>
-        <button class="btn primary" data-act="${last ? "tour-end" : "tour-next"}" data-finish="${last}">${last ? "Empezar a planificar" : "Siguiente"}</button>
+        <div class="dots" role="img" aria-label="Paso ${tourStep + 1} de ${TOUR.length}">${TOUR.map((_, i) => `<i class="${i === tourStep ? "on" : ""}"></i>`).join("")}</div>
+        <button class="btn primary" data-act="${last ? "tour-end" : "tour-next"}" data-finish="${last}">${last ? "Empezar" : "Siguiente"}</button>
       </div>
     </div>`;
     el.hidden = false;

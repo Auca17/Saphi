@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "proto", "runtimeExecutable": "python", "runtimeArgs": ["-m", "http.server", "8765", "--directory", "C:/Users/Rufda/AppData/Local/Temp/claude/d15dfc6ab5c62288/d9000049-34e3-47c2-b3df-01a2491cde74/scratchpad/preview"], "port": 8765 }
+  ]
+}
