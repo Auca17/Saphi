@@ -1,0 +1,32 @@
+# Render Blueprint for the Saphi M1 web service.
+# Deploys from `main`. DATABASE_URL comes from Neon (set it in the Render
+# dashboard when creating the service — see docs/DEPLOY.md).
+services:
+  - type: web
+    name: saphi
+    runtime: python
+    plan: free
+    buildCommand: >-
+      pip install uv
+      && uv sync --frozen --no-dev
+      && uv run python manage.py collectstatic --noinput
+      && uv run python manage.py migrate
+    startCommand: uv run gunicorn config.wsgi
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "false"
+      # The values below depend on your Render URL and Neon database; the
+      # dashboard asks for them when you apply this blueprint.
+      - key: ALLOWED_HOSTS
+        sync: false
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: FOUNDER_CONTACT_EMAIL
+        sync: false
