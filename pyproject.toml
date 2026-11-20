@@ -1,0 +1,43 @@
+[project]
+name = "saphi"
+version = "0.1.0"
+description = "Mobile-first web app to plan and care for gardens in Mendoza, Argentina."
+requires-python = ">=3.12"
+dependencies = [
+    "django>=5.2,<6",
+    "django-environ>=0.12",
+    "dj-database-url>=3",
+    "whitenoise>=6.9",
+    "phonenumbers>=8.13,<10",
+    "segno>=1.6",
+    "pillow>=11",
+    "gunicorn>=23; sys_platform != 'win32'",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "pytest-django>=4.9",
+    "factory-boy>=3.3",
+    "ruff>=0.8",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "W", "B", "S", "C4", "DTZ", "T20"]
+ignore = [
+    "S101",   # asserts are fine in tests
+    "DTZ001", # datetime.now() used where timezone-naive is intended (e.g. datestamp filenames)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["S", "T20"]
+"**/migrations/**" = ["E501"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+testpaths = ["apps", "tests"]
+python_files = ["test_*.py", "tests.py"]
