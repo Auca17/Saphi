@@ -14,3 +14,12 @@ def _dev_security(settings):
     settings.SECURE_PROXY_SSL_HEADER = None
     settings.SESSION_COOKIE_SECURE = False
     settings.CSRF_COOKIE_SECURE = False
+
+
+@pytest.fixture(autouse=True)
+def _plain_staticfiles(settings):
+    """Use un-hashed static URLs in tests (no collectstatic needed)."""
+    settings.STORAGES = {
+        **settings.STORAGES,
+        "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+    }
