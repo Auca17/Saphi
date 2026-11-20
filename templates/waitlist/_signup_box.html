@@ -1,0 +1,8 @@
+{# Swap target for the HTMX signup flow #}
+<div id="signup-box">
+  {% if signup_done %}
+    {% include "waitlist/_signup_success.html" %}
+  {% else %}
+    {% include "waitlist/_signup_form.html" %}
+  {% endif %}
+</div>

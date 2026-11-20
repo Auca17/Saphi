@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Privacidad" %} — Saphi{% endblock %}
+
+{% block content %}
+<header class="brand">
+  <span class="mark" aria-hidden="true"><svg class="ic"><use href="#i-leaf"/></svg></span>
+  <b>Saphi</b>
+</header>
+
+<section class="section">
+  <h1>{% translate "Privacidad" %}</h1>
+  <p class="muted">{% translate "Guardamos lo mínimo para poder avisarte. Ley 25.326." %}</p>
+</section>
+
+<section class="panel glass">
+  <div class="row">
+    <svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg>
+    <div class="grow">
+      <h3>{% translate "Qué guardamos" %}</h3>
+      <p>{% translate "Tu nombre, tu WhatsApp, tu zona, qué espacio tenés, cómo regás y qué te interesa. Si llegaste por el QR de un vivero, también anotamos de cuál." %}</p>
+    </div>
+  </div>
+  <div class="row">
+    <svg class="ic" aria-hidden="true"><use href="#i-bell"/></svg>
+    <div class="grow">
+      <h3>{% translate "Para qué lo usamos" %}</h3>
+      <p>{% translate "Para avisarte cuando salga Saphi y mandarte consejos de granizo, Zonda y helada para tus plantas. También contamos cuánta gente llega desde cada vivero." %}</p>
+    </div>
+  </div>
+  <div class="row">
+    <svg class="ic" aria-hidden="true"><use href="#i-lock"/></svg>
+    <div class="grow">
+      <h3>{% translate "Qué no hacemos" %}</h3>
+      <p>{% translate "No vendemos ni compartimos tus datos, no ponemos publicidad y no usamos rastreadores de terceros." %}</p>
+    </div>
+  </div>
+  <div class="row">
+    <svg class="ic" aria-hidden="true"><use href="#i-trash"/></svg>
+    <div class="grow">
+      <h3>{% translate "Cómo borrar tus datos" %}</h3>
+      <p>
+        {% blocktranslate with email=founder_email %}Escribinos a {{ email }} y los borramos.{% endblocktranslate %}
+      </p>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <a class="link" href="{% url "landing" %}">{% translate "Volver" %}</a>
+</footer>
+{% endblock %}
